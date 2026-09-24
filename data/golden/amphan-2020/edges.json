@@ -1,0 +1,44 @@
+[
+  {
+    "from_node": "osm:substation:kakdwip",
+    "to_node": "osm:hospital:kakdwip",
+    "relation": "powers",
+    "assumption": true
+  },
+  {
+    "from_node": "osm:substation:sagar",
+    "to_node": "osm:hospital:sagar",
+    "relation": "powers",
+    "assumption": true
+  },
+  {
+    "from_node": "osm:substation:sagar",
+    "to_node": "osm:telecom:sagar-tower",
+    "relation": "powers",
+    "assumption": true
+  },
+  {
+    "from_node": "osm:road:nh12-segment",
+    "to_node": "osm:hospital:kakdwip",
+    "relation": "accesses",
+    "assumption": true
+  },
+  {
+    "from_node": "osm:road:nh12-segment",
+    "to_node": "osm:shelter:kakdwip-03",
+    "relation": "accesses",
+    "assumption": true
+  },
+  {
+    "from_node": "osm:bridge:hatania",
+    "to_node": "osm:shelter:namkhana-02",
+    "relation": "accesses",
+    "assumption": true
+  },
+  {
+    "from_node": "osm:shelter:sagar-01",
+    "to_node": "osm:hospital:sagar",
+    "relation": "depends_on",
+    "assumption": true
+  }
+]

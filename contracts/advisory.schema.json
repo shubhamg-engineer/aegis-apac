@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "AdvisoryRole": {
+      "enum": [
+        "collector",
+        "power_operator",
+        "citizens"
+      ],
+      "title": "AdvisoryRole",
+      "type": "string"
+    },
+    "AdvisoryStatus": {
+      "enum": [
+        "draft",
+        "approved",
+        "dispatched"
+      ],
+      "title": "AdvisoryStatus",
+      "type": "string"
+    },
+    "AdvisoryValidation": {
+      "properties": {
+        "passed": {
+          "description": "True if all numbers, times, and names exist in input JSON",
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "checked_values": {
+          "description": "Count of numerical and named entities validated",
+          "title": "Checked Values",
+          "type": "integer"
+        },
+        "failures": {
+          "description": "List of unverified tokens if any",
+          "items": {
+            "type": "string"
+          },
+          "title": "Failures",
+          "type": "array"
+        }
+      },
+      "required": [
+        "passed",
+        "checked_values"
+      ],
+      "title": "AdvisoryValidation",
+      "type": "object"
+    },
+    "StatusHistory": {
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/AdvisoryStatus"
+        },
+        "at": {
+          "description": "ISO timestamp",
+          "title": "At",
+          "type": "string"
+        },
+        "actor": {
+          "description": "Operator or system identity",
+          "title": "Actor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "at",
+        "actor"
+      ],
+      "title": "StatusHistory",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "id": {
+      "description": "Advisory ID, e.g. adv-001",
+      "title": "Id",
+      "type": "string"
+    },
+    "scenario_id": {
+      "description": "Scenario ID",
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "role": {
+      "$ref": "#/$defs/AdvisoryRole",
+      "description": "Target recipient role"
+    },
+    "language": {
+      "description": "Language code: en, bn, hi, or",
+      "title": "Language",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/AdvisoryStatus",
+      "default": "draft"
+    },
+    "text": {
+      "description": "Validated advisory text content",
+      "title": "Text",
+      "type": "string"
+    },
+    "validation": {
+      "$ref": "#/$defs/AdvisoryValidation"
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/StatusHistory"
+      },
+      "title": "History",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "scenario_id",
+    "role",
+    "language",
+    "text",
+    "validation"
+  ],
+  "title": "Advisory",
+  "type": "object"
+}

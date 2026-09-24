@@ -1,0 +1,16 @@
+[
+  {
+    "district": "South 24 Parganas",
+    "trigger_probability": 0.84,
+    "payout_triggered": true,
+    "payout_amount_usd": 2500000.0,
+    "basis_risk": "Low basis risk (84% ensemble agreement on >2.5m surge index inside geofence; historical flood correlation 0.91)"
+  },
+  {
+    "district": "Purba Medinipur",
+    "trigger_probability": 0.78,
+    "payout_triggered": true,
+    "payout_amount_usd": 1500000.0,
+    "basis_risk": "Low basis risk (78% probability of exceeding Digha coastal seawall threshold)"
+  }
+]

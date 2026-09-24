@@ -1,0 +1,82 @@
+[
+  {
+    "id": "adv-001",
+    "scenario_id": "amphan-2020-t-72h",
+    "role": "collector",
+    "language": "en",
+    "status": "draft",
+    "text": "URGENT EARLY ACTION ADVISORY: District South 24 Parganas. Predicted surge inundation reaches 0.62m at Sagar Island. 33kV Sagar Substation failure probability 88% by 2020-05-20T06:00:00Z, triggering hospital backup failure by 12:00:00Z. Complete evacuation of 14,000 citizens to Sagar Central Shelter by 2020-05-20T04:00:00Z. Close NH-12 causeway at 06:00:00Z.",
+    "validation": {
+      "passed": true,
+      "checked_values": 9,
+      "failures": []
+    },
+    "history": [
+      {
+        "status": "draft",
+        "at": "2020-05-17T12:00:00Z",
+        "actor": "system"
+      }
+    ]
+  },
+  {
+    "id": "adv-002",
+    "scenario_id": "amphan-2020-t-72h",
+    "role": "collector",
+    "language": "bn",
+    "status": "draft",
+    "text": "\u099c\u09b0\u09c1\u09b0\u09bf \u0986\u0997\u09be\u09ae \u09b8\u09a4\u09b0\u09cd\u0995\u09ac\u09be\u09b0\u09cd\u09a4\u09be: \u09a6\u0995\u09cd\u09b7\u09bf\u09a3 \u09e8\u09ea \u09aa\u09b0\u0997\u09a8\u09be \u099c\u09c7\u09b2\u09be\u0964 \u09b8\u09be\u0997\u09b0 \u09a6\u09cd\u09ac\u09c0\u09aa\u09c7 \u09aa\u09cd\u09b2\u09be\u09ac\u09a8\u09c7\u09b0 \u0989\u099a\u09cd\u099a\u09a4\u09be \u09e6.\u09ec\u09e8 \u09ae\u09bf\u099f\u09be\u09b0\u09c7 \u09aa\u09cc\u0981\u099b\u09be\u09a8\u09cb\u09b0 \u09b8\u09ae\u09cd\u09ad\u09be\u09ac\u09a8\u09be\u0964 \u09e8\u09e6 \u09ae\u09c7 \u09ad\u09cb\u09b0 \u09e6\u09ec:\u09e6\u09e6 \u099f\u09be\u09af\u09bc \u09b8\u09be\u0997\u09b0 \u09b8\u09be\u09ac\u09b8\u09cd\u099f\u09c7\u09b6\u09a8 \u09ac\u09bf\u0995\u09b2 \u09b9\u0993\u09af\u09bc\u09be\u09b0 \u09b8\u09ae\u09cd\u09ad\u09be\u09ac\u09a8\u09be \u09ee\u09ee%\u0964 \u098f\u09b0 \u09ab\u09b2\u09c7 \u09a6\u09c1\u09aa\u09c1\u09b0 \u09e7\u09e8:\u09e6\u09e6 \u099f\u09be\u09af\u09bc \u09b8\u09be\u0997\u09b0 \u0997\u09cd\u09b0\u09be\u09ae\u09c0\u09a3 \u09b9\u09be\u09b8\u09aa\u09be\u09a4\u09be\u09b2\u09c7\u09b0 \u09ac\u09bf\u09a6\u09cd\u09af\u09c1\u09ce \u09b8\u09b0\u09ac\u09b0\u09be\u09b9 \u09b8\u09ae\u09cd\u09aa\u09c2\u09b0\u09cd\u09a3 \u09ac\u09cd\u09af\u09be\u09b9\u09a4 \u09b9\u09ac\u09c7\u0964 \u09e8\u09e6 \u09ae\u09c7 \u09ad\u09cb\u09b0 \u09e6\u09ea:\u09e6\u09e6 \u099f\u09be\u09b0 \u09ae\u09a7\u09cd\u09af\u09c7 \u09e7\u09ea,\u09e6\u09e6\u09e6 \u09ac\u09be\u09b8\u09bf\u09a8\u09cd\u09a6\u09be\u0995\u09c7 \u09a8\u09bf\u09b0\u09be\u09aa\u09a6 \u09b8\u09be\u0987\u0995\u09cd\u09b2\u09cb\u09a8 \u09b8\u09c7\u09a8\u09cd\u099f\u09be\u09b0\u09c7 \u09b8\u09b0\u09bf\u09af\u09bc\u09c7 \u09a8\u09bf\u09a8\u0964 \u09b8\u0995\u09be\u09b2 \u09e6\u09ec:\u09e6\u09e6 \u099f\u09be\u09af\u09bc \u098f\u09a8\u098f\u0987\u099a-\u09e7\u09e8 \u09ac\u09a8\u09cd\u09a7 \u0995\u09b0\u09c1\u09a8\u0964",
+    "validation": {
+      "passed": true,
+      "checked_values": 9,
+      "failures": []
+    },
+    "history": [
+      {
+        "status": "draft",
+        "at": "2020-05-17T12:00:00Z",
+        "actor": "system"
+      }
+    ]
+  },
+  {
+    "id": "adv-003",
+    "scenario_id": "amphan-2020-t-72h",
+    "role": "power_operator",
+    "language": "en",
+    "status": "draft",
+    "text": "GRID DEFENSE DIRECTIVE: 33kV Sagar Island Substation is at 88% probability of saltwater inundation (>0.4m) starting 2020-05-20T06:00:00Z. Perform controlled proactive de-energization by 05:30:00Z to protect grid assets and avoid feeder explosion. Alert Kakdwip 132kV station of potential load shedding by 08:00:00Z.",
+    "validation": {
+      "passed": true,
+      "checked_values": 7,
+      "failures": []
+    },
+    "history": [
+      {
+        "status": "draft",
+        "at": "2020-05-17T12:00:00Z",
+        "actor": "system"
+      }
+    ]
+  },
+  {
+    "id": "adv-004",
+    "scenario_id": "amphan-2020-t-72h",
+    "role": "citizens",
+    "language": "en",
+    "status": "draft",
+    "text": "COMMUNITY ALERT: Cyclone Amphan approaching. Sagar Island and Kakdwip coastal areas face severe flooding over 0.5m. Power and cellular coverage will fail after 2020-05-20T06:00:00Z. Move immediately to Sagar Central Shelter or Namkhana High School Shelter before 04:00:00Z. Do not use NH-12 coastal causeway after 06:00:00Z.",
+    "validation": {
+      "passed": true,
+      "checked_values": 6,
+      "failures": []
+    },
+    "history": [
+      {
+        "status": "draft",
+        "at": "2020-05-17T12:00:00Z",
+        "actor": "system"
+      }
+    ]
+  }
+]

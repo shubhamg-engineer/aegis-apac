@@ -1,0 +1,39 @@
+{
+  "properties": {
+    "district": {
+      "description": "District name",
+      "title": "District",
+      "type": "string"
+    },
+    "trigger_probability": {
+      "description": "Probability trigger condition is met",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Trigger Probability",
+      "type": "number"
+    },
+    "payout_triggered": {
+      "description": "True if trigger probability >= policy threshold",
+      "title": "Payout Triggered",
+      "type": "boolean"
+    },
+    "payout_amount_usd": {
+      "default": 0.0,
+      "title": "Payout Amount Usd",
+      "type": "number"
+    },
+    "basis_risk": {
+      "description": "Assessment of false positive / false negative risk",
+      "title": "Basis Risk",
+      "type": "string"
+    }
+  },
+  "required": [
+    "district",
+    "trigger_probability",
+    "payout_triggered",
+    "basis_risk"
+  ],
+  "title": "ParametricResult",
+  "type": "object"
+}

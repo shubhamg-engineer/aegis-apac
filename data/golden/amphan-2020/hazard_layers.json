@@ -1,0 +1,149 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "time_step_h": -24,
+        "threshold_m": 0.3,
+        "prob": 0.45,
+        "level": "moderate"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.0,
+              21.55
+            ],
+            [
+              88.15,
+              21.55
+            ],
+            [
+              88.15,
+              21.7
+            ],
+            [
+              88.0,
+              21.7
+            ],
+            [
+              88.0,
+              21.55
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "time_step_h": -12,
+        "threshold_m": 0.3,
+        "prob": 0.72,
+        "level": "high"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              87.95,
+              21.5
+            ],
+            [
+              88.25,
+              21.5
+            ],
+            [
+              88.25,
+              21.8
+            ],
+            [
+              87.95,
+              21.8
+            ],
+            [
+              87.95,
+              21.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "time_step_h": 0,
+        "threshold_m": 0.3,
+        "prob": 0.94,
+        "level": "severe"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              87.9,
+              21.45
+            ],
+            [
+              88.4,
+              21.45
+            ],
+            [
+              88.4,
+              21.95
+            ],
+            [
+              87.9,
+              21.95
+            ],
+            [
+              87.9,
+              21.45
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "time_step_h": 0,
+        "threshold_m": 1.0,
+        "prob": 0.81,
+        "level": "catastrophic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.02,
+              21.58
+            ],
+            [
+              88.2,
+              21.58
+            ],
+            [
+              88.2,
+              21.75
+            ],
+            [
+              88.02,
+              21.75
+            ],
+            [
+              88.02,
+              21.58
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Muriganga Estuary Surge Pathway",
+        "type": "surge_funnel",
+        "risk": "high"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            88.08,
+            21.55
+          ],
+          [
+            88.12,
+            21.68
+          ],
+          [
+            88.18,
+            21.82
+          ],
+          [
+            88.22,
+            21.9
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kakdwip Drainage Basin Channel",
+        "type": "rainfall_drainage",
+        "risk": "moderate"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            88.25,
+            21.95
+          ],
+          [
+            88.2,
+            21.88
+          ],
+          [
+            88.19,
+            21.82
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sagar South Accumulation Zone",
+        "type": "depression_sink",
+        "risk": "critical"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.04,
+              21.6
+            ],
+            [
+              88.1,
+              21.6
+            ],
+            [
+              88.1,
+              21.66
+            ],
+            [
+              88.04,
+              21.66
+            ],
+            [
+              88.04,
+              21.6
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

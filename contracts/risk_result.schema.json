@@ -1,0 +1,84 @@
+{
+  "$defs": {
+    "CauseEvent": {
+      "properties": {
+        "node": {
+          "description": "Node where event occurs",
+          "title": "Node",
+          "type": "string"
+        },
+        "event": {
+          "description": "Event description, e.g. flooded, loses_grid_power",
+          "title": "Event",
+          "type": "string"
+        },
+        "probability": {
+          "description": "Probability of this event",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Probability",
+          "type": "number"
+        },
+        "assumption": {
+          "description": "True if rule/event is an assumption",
+          "title": "Assumption",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "node",
+        "event",
+        "probability",
+        "assumption"
+      ],
+      "title": "CauseEvent",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "facility_id": {
+      "description": "Target facility ID",
+      "title": "Facility Id",
+      "type": "string"
+    },
+    "scenario_id": {
+      "description": "Associated forecast scenario ID",
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "failure_probability": {
+      "description": "Ensemble probability of failure",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Failure Probability",
+      "type": "number"
+    },
+    "earliest_failure_time": {
+      "description": "Earliest expected failure ISO timestamp",
+      "title": "Earliest Failure Time",
+      "type": "string"
+    },
+    "hours_of_warning": {
+      "description": "Hours from forecast to failure",
+      "title": "Hours Of Warning",
+      "type": "number"
+    },
+    "cause_chain": {
+      "description": "Ordered chain of failure events",
+      "items": {
+        "$ref": "#/$defs/CauseEvent"
+      },
+      "title": "Cause Chain",
+      "type": "array"
+    }
+  },
+  "required": [
+    "facility_id",
+    "scenario_id",
+    "failure_probability",
+    "earliest_failure_time",
+    "hours_of_warning"
+  ],
+  "title": "RiskResult",
+  "type": "object"
+}

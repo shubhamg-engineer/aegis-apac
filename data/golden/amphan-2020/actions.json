@@ -1,0 +1,48 @@
+[
+  {
+    "id": "act-001",
+    "district": "South 24 Parganas",
+    "type": "evacuate",
+    "description": "Evacuate 14,000 residents from low-lying Sagar Island wards to Sagar Central Shelter and Namkhana Shelter",
+    "deadline": "2020-05-20T04:00:00Z",
+    "supporting_risk_ids": [
+      "osm:substation:sagar",
+      "osm:hospital:sagar"
+    ],
+    "confidence": 0.88
+  },
+  {
+    "id": "act-002",
+    "district": "South 24 Parganas",
+    "type": "close_road",
+    "description": "Close NH-12 coastal causeway to light emergency and civilian vehicles ahead of 0.48m predicted inundation",
+    "deadline": "2020-05-20T06:00:00Z",
+    "supporting_risk_ids": [
+      "osm:road:nh12-segment"
+    ],
+    "confidence": 0.76
+  },
+  {
+    "id": "act-003",
+    "district": "South 24 Parganas",
+    "type": "deenergise",
+    "description": "Proactively de-energise 33kV Sagar Island Substation prior to saltwater inundation to prevent transformer failure",
+    "deadline": "2020-05-20T05:30:00Z",
+    "supporting_risk_ids": [
+      "osm:substation:sagar"
+    ],
+    "confidence": 0.88
+  },
+  {
+    "id": "act-004",
+    "district": "South 24 Parganas",
+    "type": "protect_facility",
+    "description": "Pre-position 2 portable diesel generators and mobile telecom satellite kit at Kakdwip Sub-Divisional Hospital",
+    "deadline": "2020-05-19T18:00:00Z",
+    "supporting_risk_ids": [
+      "osm:hospital:kakdwip",
+      "osm:substation:kakdwip"
+    ],
+    "confidence": 0.65
+  }
+]

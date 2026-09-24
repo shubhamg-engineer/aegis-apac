@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "time_step_h": {
+      "description": "Hours relative to landfall (-24, -12, -6, 0, 6)",
+      "title": "Time Step H",
+      "type": "integer"
+    },
+    "threshold_m": {
+      "description": "Depth threshold in meters (e.g. 0.3, 1.0)",
+      "title": "Threshold M",
+      "type": "number"
+    },
+    "geojson": {
+      "additionalProperties": true,
+      "description": "FeatureCollection of probability contours",
+      "title": "Geojson",
+      "type": "object"
+    }
+  },
+  "required": [
+    "scenario_id",
+    "time_step_h",
+    "threshold_m",
+    "geojson"
+  ],
+  "title": "HazardLayerIndex",
+  "type": "object"
+}

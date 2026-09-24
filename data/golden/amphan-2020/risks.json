@@ -1,0 +1,110 @@
+[
+  {
+    "facility_id": "osm:substation:sagar",
+    "scenario_id": "amphan-2020-t-72h",
+    "failure_probability": 0.88,
+    "earliest_failure_time": "2020-05-20T06:00:00Z",
+    "hours_of_warning": 66.0,
+    "cause_chain": [
+      {
+        "node": "osm:substation:sagar",
+        "event": "flooded_depth_0.62m",
+        "probability": 0.88,
+        "assumption": false
+      }
+    ]
+  },
+  {
+    "facility_id": "osm:telecom:sagar-tower",
+    "scenario_id": "amphan-2020-t-72h",
+    "failure_probability": 0.85,
+    "earliest_failure_time": "2020-05-20T10:00:00Z",
+    "hours_of_warning": 70.0,
+    "cause_chain": [
+      {
+        "node": "osm:substation:sagar",
+        "event": "flooded_depth_0.62m",
+        "probability": 0.88,
+        "assumption": false
+      },
+      {
+        "node": "osm:telecom:sagar-tower",
+        "event": "battery_depleted_after_4h",
+        "probability": 0.85,
+        "assumption": true
+      }
+    ]
+  },
+  {
+    "facility_id": "osm:hospital:sagar",
+    "scenario_id": "amphan-2020-t-72h",
+    "failure_probability": 0.82,
+    "earliest_failure_time": "2020-05-20T12:00:00Z",
+    "hours_of_warning": 72.0,
+    "cause_chain": [
+      {
+        "node": "osm:substation:sagar",
+        "event": "flooded_depth_0.62m",
+        "probability": 0.88,
+        "assumption": false
+      },
+      {
+        "node": "osm:hospital:sagar",
+        "event": "generator_fuel_exhausted_after_6h",
+        "probability": 0.82,
+        "assumption": true
+      }
+    ]
+  },
+  {
+    "facility_id": "osm:road:nh12-segment",
+    "scenario_id": "amphan-2020-t-72h",
+    "failure_probability": 0.76,
+    "earliest_failure_time": "2020-05-20T07:00:00Z",
+    "hours_of_warning": 67.0,
+    "cause_chain": [
+      {
+        "node": "osm:road:nh12-segment",
+        "event": "inundated_depth_0.48m",
+        "probability": 0.76,
+        "assumption": false
+      }
+    ]
+  },
+  {
+    "facility_id": "osm:substation:kakdwip",
+    "scenario_id": "amphan-2020-t-72h",
+    "failure_probability": 0.65,
+    "earliest_failure_time": "2020-05-20T08:00:00Z",
+    "hours_of_warning": 68.0,
+    "cause_chain": [
+      {
+        "node": "osm:substation:kakdwip",
+        "event": "flooded_depth_0.45m",
+        "probability": 0.65,
+        "assumption": false
+      }
+    ]
+  },
+  {
+    "facility_id": "osm:hospital:kakdwip",
+    "scenario_id": "amphan-2020-t-72h",
+    "failure_probability": 0.48,
+    "earliest_failure_time": "2020-05-20T16:00:00Z",
+    "hours_of_warning": 76.0,
+    "cause_chain": [
+      {
+        "node": "osm:substation:kakdwip",
+        "event": "flooded_depth_0.45m",
+        "probability": 0.65,
+        "assumption": false
+      },
+      {
+        "node": "osm:hospital:kakdwip",
+        "event": "generator_fuel_exhausted_after_8h",
+        "probability": 0.48,
+        "assumption": true
+      }
+    ]
+  }
+]

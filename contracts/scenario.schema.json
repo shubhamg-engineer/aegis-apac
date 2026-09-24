@@ -1,0 +1,44 @@
+{
+  "properties": {
+    "id": {
+      "description": "Unique scenario ID, e.g. amphan-2020-t-72h",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "description": "Human-readable scenario name",
+      "title": "Name",
+      "type": "string"
+    },
+    "lead_time_h": {
+      "description": "Forecast lead time in hours (e.g. 72)",
+      "title": "Lead Time H",
+      "type": "integer"
+    },
+    "forecast_time": {
+      "description": "Timestamp of forecast issuance",
+      "title": "Forecast Time",
+      "type": "string"
+    },
+    "ensemble_members": {
+      "default": 40,
+      "description": "Number of perturbed members",
+      "title": "Ensemble Members",
+      "type": "integer"
+    },
+    "golden": {
+      "default": false,
+      "description": "True if frozen precomputed scenario",
+      "title": "Golden",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "lead_time_h",
+    "forecast_time"
+  ],
+  "title": "Scenario",
+  "type": "object"
+}

@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "ActionType": {
+      "enum": [
+        "evacuate",
+        "close_road",
+        "deenergise",
+        "protect_facility",
+        "pre_position_relief"
+      ],
+      "title": "ActionType",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "id": {
+      "description": "Action identifier, e.g. act-001",
+      "title": "Id",
+      "type": "string"
+    },
+    "district": {
+      "description": "Target administrative district",
+      "title": "District",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/ActionType",
+      "description": "Category of anticipatory action"
+    },
+    "description": {
+      "description": "Actionable instruction",
+      "title": "Description",
+      "type": "string"
+    },
+    "deadline": {
+      "description": "Execution deadline ISO timestamp",
+      "title": "Deadline",
+      "type": "string"
+    },
+    "supporting_risk_ids": {
+      "description": "Facility IDs justifying action",
+      "items": {
+        "type": "string"
+      },
+      "title": "Supporting Risk Ids",
+      "type": "array"
+    },
+    "confidence": {
+      "description": "Statistical confidence",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "district",
+    "type",
+    "description",
+    "deadline",
+    "confidence"
+  ],
+  "title": "Action",
+  "type": "object"
+}

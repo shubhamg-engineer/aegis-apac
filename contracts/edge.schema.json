@@ -1,0 +1,43 @@
+{
+  "$defs": {
+    "EdgeRelation": {
+      "enum": [
+        "powers",
+        "serves",
+        "accesses",
+        "depends_on"
+      ],
+      "title": "EdgeRelation",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "from_node": {
+      "description": "Origin node ID",
+      "title": "From Node",
+      "type": "string"
+    },
+    "to_node": {
+      "description": "Destination node ID",
+      "title": "To Node",
+      "type": "string"
+    },
+    "relation": {
+      "$ref": "#/$defs/EdgeRelation",
+      "description": "Type of structural or functional link"
+    },
+    "assumption": {
+      "default": true,
+      "description": "True if link is inferred or estimated",
+      "title": "Assumption",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "from_node",
+    "to_node",
+    "relation"
+  ],
+  "title": "Edge",
+  "type": "object"
+}

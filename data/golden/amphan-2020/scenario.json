@@ -1,0 +1,8 @@
+{
+  "id": "amphan-2020-t-72h",
+  "name": "Cyclone Amphan (May 2020) - 72h Pre-Landfall Ensemble",
+  "lead_time_h": 72,
+  "forecast_time": "2020-05-17T12:00:00Z",
+  "ensemble_members": 40,
+  "golden": true
+}

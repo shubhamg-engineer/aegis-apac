@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "FacilityType": {
+      "enum": [
+        "substation",
+        "hospital",
+        "shelter",
+        "telecom_tower",
+        "bridge",
+        "road_segment"
+      ],
+      "title": "FacilityType",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "id": {
+      "description": "Unique facility identifier, e.g. osm:node/123",
+      "title": "Id",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/FacilityType",
+      "description": "Classification of infrastructure"
+    },
+    "name": {
+      "description": "Human-readable facility name",
+      "title": "Name",
+      "type": "string"
+    },
+    "geometry": {
+      "additionalProperties": true,
+      "description": "GeoJSON Point or LineString geometry",
+      "title": "Geometry",
+      "type": "object"
+    },
+    "elevation_m": {
+      "description": "Ground elevation in meters",
+      "title": "Elevation M",
+      "type": "number"
+    },
+    "attributes": {
+      "additionalProperties": true,
+      "description": "Capacity, backup power, etc.",
+      "title": "Attributes",
+      "type": "object"
+    },
+    "assumption_fields": {
+      "description": "Attributes populated by assumption",
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumption Fields",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "name",
+    "geometry",
+    "elevation_m"
+  ],
+  "title": "Facility",
+  "type": "object"
+}
