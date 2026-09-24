@@ -1,0 +1,10 @@
+{
+  "layer_name": "NASA GPM IMERG Precipitation Fields",
+  "source": "NASA / GSFC GPM IMERG Final Run V06",
+  "date_generated": "2026-09-24T13:13:20.138100+00:00",
+  "licence": "NASA Open Data",
+  "resolution": "0.1\u00b0 resampled to 30m grid",
+  "crs": "EPSG:4326",
+  "attribution": "NASA Goddard Space Flight Center / GPM Science Team",
+  "file_name": "rainfall_accumulation.npz"
+}

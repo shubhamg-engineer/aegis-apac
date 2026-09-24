@@ -1,0 +1,97 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hooghly / Muriganga Estuarine Surge Funnel",
+        "channel_type": "surge_funnel",
+        "upstream_area_km2": 420.5,
+        "risk_level": "critical"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            88.08,
+            21.55
+          ],
+          [
+            88.12,
+            21.68
+          ],
+          [
+            88.18,
+            21.82
+          ],
+          [
+            88.22,
+            21.9
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Saptamukhi River Tidal Creek Drainage",
+        "channel_type": "tidal_creek",
+        "upstream_area_km2": 195.0,
+        "risk_level": "high"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            88.28,
+            21.65
+          ],
+          [
+            88.32,
+            21.75
+          ],
+          [
+            88.35,
+            21.88
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kakdwip Agricultural Lowland Depression Sink",
+        "channel_type": "depression_sink",
+        "depth_accumulation_potential_m": 0.85,
+        "risk_level": "severe"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.16,
+              21.85
+            ],
+            [
+              88.22,
+              21.85
+            ],
+            [
+              88.22,
+              21.9
+            ],
+            [
+              88.16,
+              21.9
+            ],
+            [
+              88.16,
+              21.85
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

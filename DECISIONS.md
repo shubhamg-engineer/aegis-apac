@@ -55,7 +55,21 @@ This log documents foundational choices, data sources, assumptions, and known ph
 
 ---
 
-## 5. Infrastructure Dependency & Cascade Rules (All Are Assumptions)
+## 5. Phase 2: Ingestion Pipeline & Metadata Layer Status
+
+* **Master CLI Command:** `python -m src.ingest.pipeline --region bengal_delta --storm amphan_2020`
+* **Artifacts Generated (`data/processed/bengal_delta/`):**
+  * `storm_track_amphan_2020.json` (+ `.meta.json`): IBTrACS best-track points with pressure, wind, and stage.
+  * `facilities.json` (+ `.meta.json`): OpenStreetMap critical infrastructure normalized into `Facility` contracts.
+  * `infrastructure_edges.json` (+ `.meta.json`): Inferred dependency graph (`powers`, `accesses`, `depends_on`) with `assumption: true`.
+  * `dem_elevation.npz` (+ `.meta.json`): Copernicus GLO-30 30m Digital Surface Model, D8 flow accumulation, and sea mask.
+  * `drainage_pathways.geojson` (+ `.meta.json`): GeoJSON drainage channels, tidal creeks, and agricultural depression sinks.
+  * `rainfall_accumulation.npz` (+ `.meta.json`): NASA GPM IMERG cumulative precipitation fields at $T-24\text{h}$, $T-12\text{h}$, $T-6\text{h}$, $T-0\text{h}$, and $T+6\text{h}$.
+* **Compliance:** 100% of layers include standardized `.meta.json` files with source, date, licence, resolution, CRS, and attribution.
+
+---
+
+## 6. Infrastructure Dependency & Cascade Rules (All Are Assumptions)
 
 * **Substation:** Fails when inundation depth exceeds `0.4 m`.
 * **Roads:** Impassable for light emergency vehicles at `0.3 m`; impassable for heavy trucks at `0.6 m`.

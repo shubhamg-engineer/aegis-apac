@@ -1,0 +1,10 @@
+{
+  "layer_name": "Copernicus DEM Surface Model & Sea Mask",
+  "source": "ESA / Copernicus DEM GLO-30",
+  "date_generated": "2026-09-24T13:13:20.117659+00:00",
+  "licence": "Open Data (ESA / Copernicus)",
+  "resolution": "30m nominal (resampled grid)",
+  "crs": "EPSG:4326 / UTM Zone 45N",
+  "attribution": "European Space Agency (ESA) Copernicus Programme",
+  "file_name": "dem_elevation.npz"
+}
