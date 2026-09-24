@@ -42,7 +42,10 @@ class HollandProfile:
         heading_deg: float = 25.0,  # North-Northeastward track typical of Amphan
     ) -> Dict[str, np.ndarray]:
         """Compute 2D wind speed and atmospheric pressure grids."""
-        xx, yy = np.meshgrid(lons, lats)
+        if lons.ndim == 1 and lats.ndim == 1:
+            xx, yy = np.meshgrid(lons, lats)
+        else:
+            xx, yy = lons, lats
         
         # Distance (km) and bearing from cyclone center
         dx_km = (xx - center_lon) * 111.320 * np.cos(np.radians(yy))
