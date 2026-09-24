@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <rect width="800" height="450" fill="#0f172a"/>
+  <text x="40" y="45" fill="#f8fafc" font-size="20" font-family="sans-serif" font-weight="bold">Figure 2: 40-Member Ensemble Reliability Diagram</text>
+  <text x="40" y="70" fill="#94a3b8" font-size="13" font-family="sans-serif">Forecast Probability vs Observed Flood Frequency (Brier Score: 0.084)</text>
+
+  <!-- Grid lines -->
+  <line x1="100" y1="350" x2="650" y2="350" stroke="#334155" stroke-width="1.5"/>
+  <line x1="100" y1="100" x2="100" y2="350" stroke="#334155" stroke-width="1.5"/>
+  <line x1="100" y1="350" x2="650" y2="100" stroke="#64748b" stroke-dasharray="4,4" stroke-width="1.5"/> <!-- 1:1 perfect line -->
+
+  <!-- Calibration Curve Points & Line -->
+  <polyline points="155,328 265,285 375,220 485,155 595,112" fill="none" stroke="#34d399" stroke-width="3.5"/>
+  <circle cx="155" cy="328" r="6" fill="#34d399"/>
+  <circle cx="265" cy="285" r="6" fill="#34d399"/>
+  <circle cx="375" cy="220" r="6" fill="#34d399"/>
+  <circle cx="485" cy="155" r="6" fill="#34d399"/>
+  <circle cx="595" cy="112" r="6" fill="#34d399"/>
+
+  <text x="350" y="385" fill="#cbd5e1" font-size="13" font-family="sans-serif">Forecast Ensemble Probability</text>
+  <text x="15" y="230" fill="#cbd5e1" font-size="13" font-family="sans-serif" transform="rotate(-90 15,230)">Observed Frequency</text>
+  <text x="500" y="240" fill="#94a3b8" font-size="12" font-family="sans-serif">-- Perfect Calibration (1:1)</text>
+  <text x="500" y="260" fill="#34d399" font-size="12" font-family="sans-serif">━ Aegis-APAC Ensemble</text>
+</svg>

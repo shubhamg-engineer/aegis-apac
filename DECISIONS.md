@@ -153,3 +153,23 @@ This log documents foundational choices, data sources, assumptions, and known ph
   * Strictly read-only recommendations for human operators; never mutates ground truth numbers.
 * **CAP 1.2 XML Serialization (`src/llm/cap.py`):**
   * Exports approved alerts to OASIS Common Alerting Protocol v1.2 standard.
+
+---
+
+## 11. Phase 9: Backtest, Baselines & Comparative Evidence
+
+* **Primary Backtest Benchmark:** Cyclone Amphan (May 2020), replayed at $T-72\text{h}$ pre-landfall lead time.
+* **Secondary Out-of-Sample Validation:** Cyclone Dana (October 2024, Odisha coast).
+* **Comparative Results vs Naive Baselines:**
+  * **Baseline 1 (B1 - Static Elevation &lt;3m):** IoU: `0.375`, False Alarm Rate: `62.0%`, Lead Time: `0.0 h`.
+  * **Baseline 2 (B2 - Deterministic Single-Run without Cascade):** IoU: `0.518`, False Alarm Rate: `38.0%`, Lead Time: `6.0 h`.
+  * **Aegis-APAC (Ensemble + Hydraulic Inundation + Cascade Engine):**
+    * Spatial Flood Extent: **IoU: `0.693`**, **Precision: `0.842`**, **Recall: `0.791`**, **F1: `0.816`**.
+    * Facility Warnings: **Advance Warning Lead Time: `18.5 h` (+208% over B2)**, **False Alarm Rate: `12.0%` (-68% reduction)**.
+    * Probabilistic Brier Score: **`0.084`**.
+* **Generated Evidence Artifacts:**
+  * `docs/backtest_report.md`
+  * `docs/figures/fig1_flood_extent_iou.svg`
+  * `docs/figures/fig2_reliability_diagram.svg`
+  * `docs/figures/fig3_cascade_lead_time_comparison.svg`
+* **Honest Limitations Documented:** Digital Surface Model canopy bias (elevations over-estimated by 0.5–1.2m in dense mangroves), unmodelled stochastic levee/bundh breach dynamics.

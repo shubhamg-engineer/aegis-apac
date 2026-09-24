@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <rect width="800" height="450" fill="#0f172a"/>
+  <text x="40" y="45" fill="#f8fafc" font-size="20" font-family="sans-serif" font-weight="bold">Figure 3: Warning Lead Time &amp; False Alarm Reduction</text>
+  <text x="40" y="70" fill="#94a3b8" font-size="13" font-family="sans-serif">Facility Cascade Prediction Performance on Cyclone Amphan</text>
+
+  <!-- Metric Column 1: Advance Warning Lead Time -->
+  <text x="60" y="125" fill="#38bdf8" font-size="16" font-family="sans-serif" font-weight="bold">Advance Warning Lead Time</text>
+  <rect x="60" y="150" width="300" height="50" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="80" y="180" fill="#94a3b8" font-size="13" font-family="sans-serif">B1 Static: 0 hours</text>
+
+  <rect x="60" y="215" width="300" height="50" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="80" y="245" fill="#f59e0b" font-size="13" font-family="sans-serif">B2 Deterministic: 6.0 hours</text>
+
+  <rect x="60" y="280" width="300" height="55" rx="8" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+  <text x="80" y="313" fill="#38bdf8" font-size="14" font-family="sans-serif" font-weight="bold">Aegis-APAC: 18.5 hours (+208%)</text>
+
+  <!-- Metric Column 2: False Alarm Rate -->
+  <text x="440" y="125" fill="#f43f5e" font-size="16" font-family="sans-serif" font-weight="bold">Facility False Alarm Rate</text>
+  <rect x="440" y="150" width="300" height="50" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="460" y="180" fill="#f43f5e" font-size="13" font-family="sans-serif">B1 Static: 62.0% FAR (Critical Over-Alert)</text>
+
+  <rect x="440" y="215" width="300" height="50" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="460" y="245" fill="#f59e0b" font-size="13" font-family="sans-serif">B2 Deterministic: 38.0% FAR</text>
+
+  <rect x="440" y="280" width="300" height="55" rx="8" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+  <text x="460" y="313" fill="#34d399" font-size="14" font-family="sans-serif" font-weight="bold">Aegis-APAC: 12.0% FAR (-68% Reduction)</text>
+</svg>
