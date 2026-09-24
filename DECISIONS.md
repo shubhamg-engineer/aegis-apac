@@ -69,7 +69,23 @@ This log documents foundational choices, data sources, assumptions, and known ph
 
 ---
 
-## 6. Infrastructure Dependency & Cascade Rules (All Are Assumptions)
+## 6. Phase 3: Hazard Engine Calibration Results
+
+* **Calibrated Parameters (Grid Search):**
+  * `surge_multiplier`: **1.15** (fitted against observed high-water marks in Digha & Sagar Island: 3.8m - 4.5m total water level).
+  * `inland_decay_rate`: **0.00018 m/m** (0.18 m water level decrease per km inland through coastal friction & delta vegetation).
+  * `astronomical_tide_baseline_m`: **1.8 m** (mean spring high water for northern Bay of Bengal).
+* **Validation Against Copernicus EMS (EMSR439) Flood Reference:**
+  * **IoU (Jaccard Index):** `0.693`
+  * **Precision:** `0.842`
+  * **Recall:** `0.791`
+  * **F1-Score:** `0.816`
+* **Hydraulic Connectivity Validation:**
+  * Confirmed: Disconnected inland depressions below sea level remain dry from storm surge unless connected to marine boundary or flooded by local rainfall runoff.
+
+---
+
+## 7. Infrastructure Dependency & Cascade Rules (All Are Assumptions)
 
 * **Substation:** Fails when inundation depth exceeds `0.4 m`.
 * **Roads:** Impassable for light emergency vehicles at `0.3 m`; impassable for heavy trucks at `0.6 m`.
