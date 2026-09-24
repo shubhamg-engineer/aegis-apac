@@ -1,0 +1,71 @@
+region:
+  id: "bengal_delta"
+  name: "Bengal Delta / Sundarbans Coastal Region"
+  country: "India"
+  states: ["West Bengal", "Odisha"]
+
+aoi:
+  description: "Sundarbans and coastal West Bengal delta area"
+  min_lon: 87.8
+  min_lat: 21.5
+  max_lon: 89.2
+  max_lat: 22.8
+  epsg_geographic: 4326
+  epsg_projected: 32645  # WGS 84 / UTM zone 45N
+
+storms:
+  primary_backtest: "amphan_2020"
+  secondary_validation: "dana_2024"
+
+languages:
+  - code: "en"
+    name: "English"
+    default: true
+  - code: "bn"
+    name: "Bengali (বাংলা)"
+  - code: "hi"
+    name: "Hindi (हिन्दी)"
+  - code: "or"
+    name: "Odia (ଓଡ଼ିଆ)"
+
+hazard:
+  time_steps_hours_relative_to_landfall: [-24, -12, -6, 0, 6]
+  ensemble_members: 40
+  thresholds:
+    shallow_flood_m: 0.3
+    deep_flood_m: 1.0
+  calibration:
+    surge_multiplier: 1.15
+    inland_attenuation_decay_per_meter: 0.00018
+    astronomical_tide_baseline_m: 1.8
+
+cascade_defaults:
+  substation_failure_depth_m: 0.4
+  road_blockage_depth_light_vehicle_m: 0.3
+  road_blockage_depth_heavy_vehicle_m: 0.6
+  hospital_impairment_depth_m: 0.3
+  hospital_default_backup_power_hours: 8
+  shelter_unusable_depth_m: 0.15
+  telecom_default_battery_hours: 4
+
+data_sources:
+  storm_track:
+    provider: "IBTrACS"
+    licence: "Public Domain (NOAA)"
+  dem:
+    dataset_id: "COPERNICUS/DEM/GLO30"
+    resolution_m: 30
+    licence: "Open Data (ESA / Copernicus)"
+  rainfall:
+    dataset_id: "NASA/GPM_L3/IMERG_V06"
+    licence: "NASA Open Data"
+  infrastructure:
+    provider: "OpenStreetMap"
+    licence: "Open Database License (ODbL)"
+  population:
+    provider: "WorldPop"
+    resolution_m: 100
+    licence: "Creative Commons Attribution 4.0 (CC BY 4.0)"
+  basemap:
+    provider: "CartoDB Positron / OSM Vector Tiles"
+    licence: "Free, open, no token required"
