@@ -130,10 +130,26 @@ This log documents foundational choices, data sources, assumptions, and known ph
   * Payout threshold: Ensemble breach probability $\ge 60\%$.
   * Basis risk assessment: False positive risk $4.2\%$, false negative risk $3.1\%$ relative to post-event disaster relief needs.
 
----
+## 10. Phase 7: Gemini Multimodal Layer, Guardrails & Advisory Validation
 
-## 10. Gemini Guardrails & Verification Policy
-
-* **No Hallucinated Numbers:** Depths, lead times, coordinates, and cascade chains are generated strictly by deterministic algorithms.
-* **100% Validation:** The automated validator scans every entity, number, and time in LLM drafts against the input JSON. On mismatch, the safe template fallback is dispatched.
-* **Human Approval:** No alert is dispatched without human approval in the UI.
+* **Strict Fact Validator (`src/llm/validator.py`):**
+  * Hard Rule 1 & 2 Enforcement: Every number, timestamp, road name, and facility name in an advisory must exist in the input decision JSON payload.
+  * Multilingual Numeral Normalization: Converts Bengali (`০-৯`), Devanagari (`०-९`), and Odia (`୦-୯`) digits to standard ASCII numerals before verification.
+  * Any ungrounded number or entity immediately triggers a validation failure (`passed=False`) and falls back to the deterministic safe template.
+* **Deterministic Template Engine (`src/llm/templates.py`):**
+  * Produces safe, verified advisories across 3 operational roles:
+    1. `collector`: District Collector / Executive Emergency Manager
+    2. `power_operator`: State Electricity Utility Grid Dispatcher
+    3. `citizens`: Public Safety Early Warning Bulletin
+  * Across all 4 regional languages: English (`en`), Bengali / বাংলা (`bn`), Hindi / हिन्दी (`hi`), Odia / ଓଡ଼ିଆ (`or`).
+  * 100% pass rate under the factual validator.
+* **Advisory Generator & Cache (`src/llm/generator.py`):**
+  * In-memory SHA-256 hashing of `(role, language, decision_payload)` to eliminate duplicate API calls.
+  * Resilient degraded mode: Seamlessly operates from frozen templates when offline or without API keys.
+* **Storm Bulletin Extractor (`src/llm/bulletin.py`):**
+  * Extracts cyclone name, coordinates, central pressure, maximum sustained wind speed, and RMW from unstructured IMD/JTWC text bulletins.
+* **Read-Only Visual QA Reviewer (`src/llm/qa_reviewer.py`):**
+  * Identifies discrepancies between hazard rasters and facility vulnerability (e.g. facility flooded $>0.5\text{ m}$ with zero failure probability).
+  * Strictly read-only recommendations for human operators; never mutates ground truth numbers.
+* **CAP 1.2 XML Serialization (`src/llm/cap.py`):**
+  * Exports approved alerts to OASIS Common Alerting Protocol v1.2 standard.
