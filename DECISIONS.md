@@ -173,3 +173,22 @@ This log documents foundational choices, data sources, assumptions, and known ph
   * `docs/figures/fig2_reliability_diagram.svg`
   * `docs/figures/fig3_cascade_lead_time_comparison.svg`
 * **Honest Limitations Documented:** Digital Surface Model canopy bias (elevations over-estimated by 0.5–1.2m in dense mangroves), unmodelled stochastic levee/bundh breach dynamics.
+
+---
+
+## 12. Phases 10 & 11: Production Hardening, Observability & Submission Assets
+
+* **Observability & Health Checks (`src/api/main.py`):**
+  * Asynchronous structured request latency tracking via `X-Process-Time-Ms` response headers.
+  * Component diagnostic `/health` checking golden data bundle and degraded mode status.
+  * Latency distribution `/metrics` endpoint exposing $p_{50}$ and $p_{95}$ response percentiles.
+* **Production Deployment:**
+  * Multi-stage `Dockerfile` with healthcheck for Google Cloud Run.
+  * Resilient offline degraded mode operates entirely from `data/golden/` without live external network dependencies.
+* **Submission Artifacts Generated:**
+  * `README.md`: Comprehensive setup, architecture, and verification instructions.
+  * `docs/architecture.md`: Complete data flow and Mermaid architecture diagrams.
+  * `docs/demo_script.md`: Timed 3-minute video walkthrough script.
+  * `docs/slide_deck.md`: 10-slide presentation deck.
+  * `docs/digital_public_good.md`: DPG standard alignment, open licensing (MIT), and standard formats (CAP 1.2, GeoJSON, COG).
+  * `docs/judges_faq.md`: Technical FAQ covering physics tradeoffs, LLM guardrails, and APAC scalability.

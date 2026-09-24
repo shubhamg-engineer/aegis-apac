@@ -7,10 +7,12 @@ approval, and generates CAP 1.2 alert feeds.
 
 import json
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import xml.etree.ElementTree as ET
+import numpy as np
 
 from fastapi import Depends, FastAPI, HTTPException, Header, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -50,6 +52,36 @@ DATA_DIR = Path(os.getenv("DATA_DIR", REPO_ROOT / "data"))
 GOLDEN_DIR = DATA_DIR / "golden" / "amphan-2020"
 DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "aegis_hackathon_demo_secret_token_2026")
+
+# Observability Metrics Store
+_METRICS = {
+    "total_requests": 0,
+    "status_2xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0,
+    "latencies_ms": [],
+}
+
+@app.middleware("http")
+async def observability_middleware(request, call_next):
+    t0 = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+    
+    _METRICS["total_requests"] += 1
+    if 200 <= response.status_code < 300:
+        _METRICS["status_2xx"] += 1
+    elif 400 <= response.status_code < 500:
+        _METRICS["status_4xx"] += 1
+    elif response.status_code >= 500:
+        _METRICS["status_5xx"] += 1
+        
+    if len(_METRICS["latencies_ms"]) > 1000:
+        _METRICS["latencies_ms"].pop(0)
+    _METRICS["latencies_ms"].append(duration_ms)
+    
+    response.headers["X-Process-Time-Ms"] = str(duration_ms)
+    return response
 
 
 def load_json(file_path: Path) -> Any:
@@ -99,13 +131,40 @@ def verify_operator_token(
 
 @app.get("/health", tags=["System"])
 def health_check():
-    """System health check and operational mode."""
+    """System health check and component operational mode."""
+    bundle_ok = (GOLDEN_DIR / "scenario.json").is_file()
     return {
-        "status": "healthy",
+        "status": "healthy" if bundle_ok else "degraded",
         "demo_mode": DEMO_MODE,
         "region": "bengal_delta",
         "version": "2.0.0",
+        "components": {
+            "golden_bundle": "ready" if bundle_ok else "missing",
+            "degraded_template_fallback": "active",
+            "gemini_api": "configured" if os.getenv("GEMINI_API_KEY") else "degraded_template_mode",
+            "database_cache": "in_memory_sqlite_ok",
+        },
         "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/metrics", tags=["System"])
+def get_metrics():
+    """Observability metrics endpoint exposing request counts and latency percentiles."""
+    latencies = _METRICS["latencies_ms"]
+    p50 = float(np.percentile(latencies, 50)) if latencies else 0.0
+    p95 = float(np.percentile(latencies, 95)) if latencies else 0.0
+    avg = float(np.mean(latencies)) if latencies else 0.0
+
+    return {
+        "total_requests": _METRICS["total_requests"],
+        "status_2xx": _METRICS["status_2xx"],
+        "status_4xx": _METRICS["status_4xx"],
+        "status_5xx": _METRICS["status_5xx"],
+        "latency_p50_ms": round(p50, 2),
+        "latency_p95_ms": round(p95, 2),
+        "latency_avg_ms": round(avg, 2),
+        "demo_mode": DEMO_MODE,
     }
 
 

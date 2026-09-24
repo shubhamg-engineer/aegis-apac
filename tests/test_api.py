@@ -125,3 +125,16 @@ def test_backtest_metrics_endpoint():
     assert "flood_extent_evaluation" in data
     assert data["flood_extent_evaluation"]["iou"] > 0.6
     assert len(data["baseline_comparison"]) == 3
+
+
+def test_metrics_and_timing_headers():
+    response = client.get("/health")
+    assert "X-Process-Time-Ms" in response.headers
+    assert float(response.headers["X-Process-Time-Ms"]) >= 0.0
+
+    metrics_res = client.get("/metrics")
+    assert metrics_res.status_code == 200
+    m_data = metrics_res.json()
+    assert m_data["total_requests"] >= 1
+    assert "latency_p50_ms" in m_data
+    assert "latency_p95_ms" in m_data
