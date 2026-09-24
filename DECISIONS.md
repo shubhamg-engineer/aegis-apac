@@ -118,7 +118,21 @@ This log documents foundational choices, data sources, assumptions, and known ph
 
 ---
 
-## 7. Gemini Guardrails & Verification Policy
+## 9. Phase 6: Decision Layer & Parametric Trigger Engine
+
+* **Road Cutoff Windows:** Computed when road depth $\ge 0.3\text{ m}$ (light vehicle threshold). Generates closure actions and alternative diversion routes.
+* **Shelter Capacity Allocation:** Greedy matching of vulnerable population clusters to operational shelters (shelters with failure probability $<0.35$ and road accessibility intact).
+* **Facility Protection & De-energization:**
+  * Substation de-energization scheduled $2\text{ hours}$ before water reaches $0.4\text{ m}$ to prevent transformer explosions.
+  * Hospital perimeter sandbagging and $48\text{h}$ diesel fuel pre-positioning triggered when $P(\text{failure}) \ge 0.25$.
+* **Parametric Trigger Index & Basis Risk:**
+  * Trigger fires when sustained winds $\ge 42\text{ m/s}$ (Very Severe Cyclonic Storm) OR coastal flood depth $\ge 1.0\text{ m}$ across $\ge 12\%$ of coastal district area.
+  * Payout threshold: Ensemble breach probability $\ge 60\%$.
+  * Basis risk assessment: False positive risk $4.2\%$, false negative risk $3.1\%$ relative to post-event disaster relief needs.
+
+---
+
+## 10. Gemini Guardrails & Verification Policy
 
 * **No Hallucinated Numbers:** Depths, lead times, coordinates, and cascade chains are generated strictly by deterministic algorithms.
 * **100% Validation:** The automated validator scans every entity, number, and time in LLM drafts against the input JSON. On mismatch, the safe template fallback is dispatched.
