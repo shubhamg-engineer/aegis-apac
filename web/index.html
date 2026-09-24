@@ -96,11 +96,16 @@
       <div>
         <div class="section-title">Parametric Liquidity Trigger</div>
         <div class="parametric-box">
-          <div style="font-size: 0.75rem; text-transform: uppercase; color: #a7f3d0; font-weight: 700;">South 24 Parganas Geofence</div>
-          <div class="metric-value">84% Probability</div>
-          <div class="metric-sub">Trigger Condition Met: <strong>$2,500,000 Early Payout</strong></div>
-          <div class="assumption-badge" style="margin-top: 0.5rem;">
-            ⚠ assumption: true (Historical flood correlation 0.91)
+          <select id="parametric-district-select" onchange="updateParametricView(this.value)" style="width: 100%; background: #0f172a; border: 1px solid var(--border-color); color: #fff; padding: 0.35rem 0.5rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 0.6rem; cursor: pointer;">
+            <option value="South 24 Parganas" selected>South 24 Parganas</option>
+            <option value="Purba Medinipur">Purba Medinipur</option>
+            <option value="Kendrapara">Kendrapara</option>
+          </select>
+          <div id="parametric-district-name" style="font-size: 0.75rem; text-transform: uppercase; color: #a7f3d0; font-weight: 700;">South 24 Parganas Geofence</div>
+          <div class="metric-value" id="parametric-prob">84% Probability</div>
+          <div class="metric-sub" id="parametric-payout">Trigger Condition Met: <strong>$2,000,000 Early Payout</strong></div>
+          <div class="assumption-badge" id="parametric-basis-risk" style="margin-top: 0.5rem;">
+            ⚠ assumption: true (Historical flood correlation 0.958, False positive risk 4.2%)
           </div>
         </div>
       </div>
@@ -158,8 +163,14 @@
 
       <!-- Tab 3: Advisory Generator & Approval -->
       <div id="tab-advisories" class="tab-content">
-        <div class="section-title">Multilingual Advisory Dispatch</div>
-        
+        <div class="section-title">Recipient Operational Role</div>
+        <div class="role-selector" style="display: flex; gap: 0.4rem; margin-bottom: 0.75rem;">
+          <button class="time-btn active" id="role-collector" onclick="switchRole('collector')">Collector</button>
+          <button class="time-btn" id="role-power_operator" onclick="switchRole('power_operator')">Grid Operator</button>
+          <button class="time-btn" id="role-citizens" onclick="switchRole('citizens')">Citizens</button>
+        </div>
+
+        <div class="section-title">Language Selection</div>
         <div class="lang-selector">
           <button class="lang-btn active" onclick="switchLang('en')">English</button>
           <button class="lang-btn" onclick="switchLang('bn')">বাংলা</button>
@@ -168,7 +179,7 @@
         </div>
 
         <div style="margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--text-secondary);">
-          Role: <strong id="advisory-role" style="color: var(--accent-cyan);">District Collector</strong>
+          Target Role: <strong id="advisory-role" style="color: var(--accent-cyan);">District Collector / DDMA</strong>
         </div>
 
         <div id="advisory-text" class="advisory-preview">
