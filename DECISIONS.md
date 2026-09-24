@@ -85,14 +85,19 @@ This log documents foundational choices, data sources, assumptions, and known ph
 
 ---
 
-## 7. Infrastructure Dependency & Cascade Rules (All Are Assumptions)
+## 7. Phase 5: Infrastructure Graph & Cascade Failure Engine (All Rules are Assumptions)
 
-* **Substation:** Fails when inundation depth exceeds `0.4 m`.
-* **Roads:** Impassable for light emergency vehicles at `0.3 m`; impassable for heavy trucks at `0.6 m`.
-* **Hospital:** Impaired if site depth > `0.3 m`, or if grid power is lost longer than backup generator endurance (default `8 hours`), or if access roads are cut.
-* **Shelter:** Unusable if site depth > `0.15 m` or if unreachable.
-* **Telecom Tower:** Fails when power outage exceeds battery endurance (default `4 hours`).
-* *UI Guardrail:* Every inferred edge and default threshold carries `assumption: true`.
+* **Implementation:** `src/graph/cascade.py` using `networkx.DiGraph`.
+* **Verified Rules & Thresholds (Marked `assumption: true`):**
+  * **Substation:** Fails when direct inundation depth $\ge 0.4\text{ m}$.
+  * **Roads & Bridges:** Impassable for emergency vehicles when depth $\ge 0.3\text{ m}$ (light) / $0.6\text{ m}$ (heavy).
+  * **Hospital:** Impaired if direct depth $\ge 0.3\text{ m}$, OR all incoming power feeds failed for longer than backup generator endurance (default `8 hours`), OR all incoming access roads are cut.
+  * **Shelter:** Unusable if direct depth $\ge 0.15\text{ m}$ OR all incoming access routes cut.
+  * **Telecom Tower:** Fails if direct depth $\ge 0.5\text{ m}$ OR power loss exceeds battery duration (default `4 hours`).
+* **Ensemble Aggregation:**
+  * Runs multi-timestep cascade across all ensemble members.
+  * Produces ranked `RiskResult` contracts with probabilistic failure rates, earliest failure timestamps, warning horizons, and explicit deduplicated `CauseEvent` chains.
+  * UI Guardrail: Every inferred edge and default threshold carries `assumption: true`.
 
 ---
 
