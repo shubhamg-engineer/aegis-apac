@@ -15,7 +15,7 @@
 // 0. CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const API_BASE      = window.location.origin;
+const API_BASE      = window.__API_BASE || window.location.origin;
 const SCENARIO_ID   = "amphan-2020-t-72h";
 const ADMIN_TOKEN   = "aegis_hackathon_demo_secret_token_2026";
 
@@ -213,28 +213,7 @@ const MapEngine = (() => {
   function init() {
     _map = new maplibregl.Map({
       container: "map",
-      style: {
-        version: 8,
-        glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
-        sources: {
-          "carto-dark": {
-            type: "raster",
-            tiles: [
-              "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-              "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-            ],
-            tileSize: 256,
-            attribution: "© OpenStreetMap © CARTO",
-          },
-        },
-        layers: [{
-          id: "carto-dark-layer",
-          type: "raster",
-          source: "carto-dark",
-          minzoom: 0,
-          maxzoom: 19,
-        }],
-      },
+      style: "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json",
       center: [88.15, 21.75],
       zoom: 9.8,
       pitch: 20,

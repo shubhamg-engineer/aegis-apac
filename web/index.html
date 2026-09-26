@@ -4,116 +4,675 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aegis-APAC — Anticipatory Cyclone Impact Platform</title>
-  <meta name="description" content="Anticipatory action and cyclone impact platform for coastal APAC. Ensemble-based probabilistic flood forecasting, infrastructure cascade analysis, and multilingual early-warning advisories for the Bengal Delta region.">
+  <meta name="description" content="Anticipatory action and cyclone impact platform for coastal APAC. Ensemble-based probabilistic flood forecasting for Bengal Delta.">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- MapLibre GL CSS -->
   <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
 
-  <!-- Application CSS -->
-  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    /* ── RESET & TOKENS ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-base:       #080d14;
+      --bg-surface:    #0d1520;
+      --bg-raised:     #121e2e;
+      --bg-hover:      #1a2a40;
+      --border:        rgba(255,255,255,.07);
+      --border-bright: rgba(255,255,255,.13);
+
+      --accent:        #38bdf8;
+      --accent-dim:    rgba(56,189,248,.15);
+      --accent-glow:   rgba(56,189,248,.3);
+      --danger:        #ef4444;
+      --warning:       #f97316;
+      --success:       #22c55e;
+      --gold:          #f59e0b;
+
+      --text-primary:  #e2e8f0;
+      --text-secondary:#94a3b8;
+      --text-muted:    #475569;
+
+      --font-sans:     'Inter', system-ui, sans-serif;
+      --font-mono:     'JetBrains Mono', monospace;
+
+      --sidebar-w:     280px;
+      --header-h:      52px;
+      --radius:        10px;
+      --radius-sm:     6px;
+
+      --transition:    .18s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    /* ── SCROLLBAR ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 99px; }
+
+    /* ── LAYOUT ─────────────────────────────────────────────────── */
+    #app-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--header-h);
+      background: rgba(8,13,20,.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+    }
+
+    .workspace {
+      position: fixed;
+      top: var(--header-h); left: 0; right: 0; bottom: 0;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr var(--sidebar-w);
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────────── */
+    .brand { display: flex; align-items: center; gap: 9px; }
+    .brand-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-icon svg { width: 15px; height: 15px; color: #fff; }
+    .brand-name { font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
+    .brand-name span { color: var(--accent); }
+    .brand-version { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-left: 4px; }
+
+    .scenario-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border-bright);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 11.5px; color: var(--text-secondary);
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.2);
+      animation: pulse 2.5s ease infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+      50%      { box-shadow: 0 0 0 6px rgba(34,197,94,.05); }
+    }
+
+    .tag-golden {
+      background: rgba(245,158,11,.12);
+      border: 1px solid rgba(245,158,11,.3);
+      color: var(--gold);
+      font-size: 10px; font-weight: 600; letter-spacing: .5px;
+      border-radius: 4px; padding: 2px 7px;
+    }
+    .tag-info {
+      background: var(--accent-dim);
+      border: 1px solid rgba(56,189,248,.25);
+      color: var(--accent);
+      font-size: 10px; font-weight: 600;
+      border-radius: 4px; padding: 2px 7px;
+    }
+
+    .header-metrics {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .h-stat { display: flex; flex-direction: column; align-items: flex-end; }
+    .h-stat-label { font-size: 9.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+    .h-stat-val { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); }
+
+    .header-divider { width: 1px; height: 24px; background: var(--border); }
+
+    #system-status {
+      font-size: 11px; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 5px;
+    }
+    #system-status::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success); flex-shrink: 0;
+    }
+
+    /* ── SIDEBARS ───────────────────────────────────────────────── */
+    .sidebar {
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .sidebar-right { border-right: none; border-left: 1px solid var(--border); }
+
+    .sidebar-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* ── TIME SCRUBBER ──────────────────────────────────────────── */
+    .time-header {
+      display: flex; align-items: baseline; gap: 6px;
+      margin-bottom: 10px;
+    }
+    .time-label-small { font-size: 11px; color: var(--text-muted); }
+    #time-display { font-size: 13px; font-weight: 600; color: var(--accent); }
+
+    .time-track { display: flex; gap: 4px; }
+    .time-btn {
+      flex: 1; padding: 6px 4px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 11px; font-weight: 500; font-family: var(--font-mono);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .time-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-bright); }
+    .time-btn.is-active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ── LAYER TOGGLES ──────────────────────────────────────────── */
+    .layer-panel { display: flex; flex-direction: column; gap: 8px; }
+    .layer-row {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .layer-row:hover { background: var(--bg-hover); }
+    .layer-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .swatch-amber { background: rgba(249,115,22,.7); }
+    .swatch-red   { background: rgba(239,68,68,.7); }
+    .swatch-cyan  { background: #06b6d4; height: 3px !important; border-radius: 2px; }
+    .swatch-yellow{ background: #f59e0b; }
+    .layer-name { flex: 1; font-size: 11.5px; color: var(--text-secondary); }
+
+    /* Toggle switch */
+    .toggle-wrap { position: relative; display: flex; align-items: center; }
+    .toggle-wrap input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      display: block; width: 30px; height: 16px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-bright);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background var(--transition);
+      position: relative;
+    }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .toggle-wrap input:checked ~ .toggle-track { background: var(--accent-dim); border-color: var(--accent); }
+    .toggle-wrap input:checked ~ .toggle-track .toggle-thumb {
+      left: 16px; background: var(--accent);
+    }
+
+    /* ── PARAMETRIC CARD ────────────────────────────────────────── */
+    .parametric-card {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .district-select {
+      width: 100%; padding: 9px 12px;
+      background: var(--bg-base);
+      border: none; border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 12px; font-family: var(--font-sans);
+      cursor: pointer;
+      outline: none;
+    }
+    .parametric-body { padding: 12px; }
+    .parametric-region { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .parametric-prob-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+    .prob-big { font-size: 28px; font-weight: 800; color: var(--warning); font-family: var(--font-mono); }
+    .prob-label { font-size: 11px; color: var(--text-muted); }
+    .payout-line { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-top: 1px solid var(--border); }
+    .assumption-badge {
+      display: inline-block; margin-top: 6px;
+      font-size: 9.5px; color: var(--gold);
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.2);
+      border-radius: 4px; padding: 2px 6px;
+    }
+
+    /* ── MAP LEGEND ─────────────────────────────────────────────── */
+    .legend-list { display: flex; flex-direction: column; gap: 7px; }
+    .legend-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-secondary); }
+    .legend-swatch { width: 14px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── MAP ────────────────────────────────────────────────────── */
+    .map-viewport { position: relative; }
+    #map { width: 100%; height: 100%; }
+
+    .map-overlay-badge {
+      position: absolute; bottom: 28px; left: 12px;
+      background: rgba(8,13,20,.8);
+      border: 1px solid var(--border-bright);
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 10.5px; color: var(--text-muted);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    /* ── RIGHT SIDEBAR ─────────────────────────────────────────── */
+    .tab-nav {
+      display: flex; border-bottom: 1px solid var(--border);
+      padding: 0 12px;
+      background: var(--bg-surface);
+    }
+    .tab-btn {
+      flex: 1; padding: 13px 4px;
+      background: none; border: none;
+      color: var(--text-muted);
+      font-size: 11.5px; font-weight: 500; font-family: var(--font-sans);
+      cursor: pointer; transition: color var(--transition);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text-secondary); }
+    .tab-btn.is-active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+    .tab-panel { display: none; flex: 1; overflow-y: auto; padding: 16px; }
+    .tab-panel.is-active { display: block; }
+
+    .panel-header { margin-bottom: 14px; }
+    .panel-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .panel-sub { font-size: 11px; color: var(--text-muted); }
+
+    /* ── EMPTY STATE ─────────────────────────────────────────────── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 12px;
+      padding: 32px 16px;
+      color: var(--text-muted); text-align: center;
+    }
+    .empty-state svg { opacity: .35; }
+    .empty-state p { font-size: 12px; line-height: 1.7; max-width: 200px; }
+
+    /* ── FACILITY CARD ───────────────────────────────────────────── */
+    .facility-card {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .fac-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .fac-type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .fac-name { font-weight: 600; font-size: 13px; flex: 1; }
+    .fac-type-tag {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      background: var(--accent-dim); color: var(--accent);
+      border-radius: 4px; padding: 2px 6px;
+    }
+
+    .fac-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+    .fac-metric { background: var(--bg-surface); padding: 10px 12px; }
+    .fac-metric-val {
+      font-size: 20px; font-weight: 800; font-family: var(--font-mono);
+      margin-bottom: 2px;
+    }
+    .fac-metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    .fac-deps { padding: 12px 14px; }
+    .deps-title { font-size: 10px; font-weight: 700; text-transform: uppercase;
+                  color: var(--text-muted); letter-spacing: .7px; margin-bottom: 8px; }
+    .dep-chip {
+      display: inline-block; margin: 2px;
+      font-size: 10.5px; padding: 3px 8px;
+      background: var(--bg-base); border: 1px solid var(--border-bright);
+      border-radius: 99px; color: var(--text-secondary);
+    }
+
+    /* ── RISK BAR ────────────────────────────────────────────────── */
+    .risk-bar-wrap { margin: 8px 0; }
+    .risk-bar-track { height: 6px; background: var(--bg-base); border-radius: 99px; overflow: hidden; }
+    .risk-bar-fill { height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+    /* ── ACTIONS ─────────────────────────────────────────────────── */
+    .action-card {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      transition: border-color var(--transition);
+    }
+    .action-card:hover { border-color: var(--border-bright); }
+    .action-row { display: flex; align-items: flex-start; gap: 10px; }
+    .action-priority {
+      font-size: 9.5px; font-weight: 700;
+      border-radius: 4px; padding: 2px 6px;
+      text-transform: uppercase; flex-shrink: 0;
+    }
+    .priority-critical { background: rgba(239,68,68,.15); color: var(--danger); border: 1px solid rgba(239,68,68,.25); }
+    .priority-high     { background: rgba(249,115,22,.15); color: var(--warning); border: 1px solid rgba(249,115,22,.25); }
+    .priority-medium   { background: rgba(245,158,11,.15); color: var(--gold); border: 1px solid rgba(245,158,11,.25); }
+    .priority-low      { background: rgba(148,163,184,.1); color: var(--text-secondary); border: 1px solid var(--border); }
+    .action-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+    .action-meta { margin-top: 8px; display: flex; gap: 12px; }
+    .action-meta-item { font-size: 10.5px; color: var(--text-muted); }
+    .action-meta-item strong { color: var(--text-secondary); }
+    .assumption-chip {
+      margin-top: 6px; display: inline-block;
+      font-size: 9.5px; color: var(--gold);
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.2);
+      border-radius: 4px; padding: 1px 6px;
+    }
+
+    /* ── ADVISORY ─────────────────────────────────────────────────── */
+    .segmented-control { display: flex; gap: 4px; margin-bottom: 10px; }
+    .role-btn {
+      flex: 1; padding: 7px 4px;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted); font-size: 11px; font-weight: 500;
+      font-family: var(--font-sans); cursor: pointer;
+      transition: all var(--transition);
+    }
+    .role-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+    .role-btn.is-active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    .lang-selector { display: flex; gap: 4px; margin-bottom: 12px; }
+    .lang-btn {
+      padding: 5px 9px;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted); font-size: 11px; font-weight: 500;
+      font-family: var(--font-sans); cursor: pointer;
+      transition: all var(--transition);
+    }
+    .lang-btn:hover { color: var(--text-primary); }
+    .lang-btn.is-active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+    .advisory-body {
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px;
+      font-size: 12px; line-height: 1.8;
+      color: var(--text-secondary); margin-bottom: 12px;
+      min-height: 100px;
+    }
+
+    .validation-strip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      background: rgba(34,197,94,.07);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: var(--radius-sm);
+      font-size: 11px; color: var(--success);
+      margin-bottom: 10px;
+    }
+    .validation-icon { font-size: 12px; }
+    .validation-detail { margin-left: auto; color: var(--text-muted); font-size: 10.5px; }
+
+    .approve-btn {
+      width: 100%; padding: 11px;
+      background: linear-gradient(135deg, #059669, #10b981);
+      border: none; border-radius: var(--radius-sm);
+      color: #fff; font-size: 13px; font-weight: 600;
+      font-family: var(--font-sans); cursor: pointer;
+      transition: all var(--transition); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .approve-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .approve-btn:active { transform: translateY(0); }
+    .approve-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .secondary-btn {
+      width: 100%; padding: 9px;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary); font-size: 12px; font-weight: 500;
+      font-family: var(--font-sans); cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .secondary-btn:hover { border-color: var(--border-bright); color: var(--text-primary); }
+
+    /* ── BACKTEST ─────────────────────────────────────────────────── */
+    .backtest-metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .metric-cell {
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px;
+      text-align: center;
+    }
+    .metric-cell-val { font-size: 22px; font-weight: 800; font-family: var(--font-mono); color: var(--accent); }
+    .metric-cell-label { font-size: 10px; text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted); margin-top: 2px; }
+
+    .table-wrapper { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+    .data-table th {
+      padding: 7px 10px; text-align: left;
+      font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--text-muted); border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+    .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    .data-table tr:hover td { background: var(--bg-hover); }
+    .data-table tr.highlight td { color: var(--accent); font-weight: 600; }
+
+    /* ── MODAL ────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .modal-overlay.is-open { opacity: 1; pointer-events: all; }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-bright);
+      border-radius: 14px;
+      width: 620px; max-width: 94vw; max-height: 85vh;
+      display: flex; flex-direction: column;
+      transform: translateY(16px);
+      transition: transform var(--transition);
+    }
+    .modal-overlay.is-open .modal-card { transform: translateY(0); }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .close-btn {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 16px; cursor: pointer; padding: 4px 8px;
+      border-radius: 6px; transition: all var(--transition);
+    }
+    .close-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .modal-badge-row { display: flex; gap: 6px; padding: 10px 20px; border-bottom: 1px solid var(--border); }
+    .modal-code {
+      flex: 1; overflow-y: auto; padding: 16px 20px;
+      font-family: var(--font-mono); font-size: 11px; line-height: 1.7;
+      color: #7dd3fc; white-space: pre-wrap; word-break: break-all;
+    }
+
+    /* ── LOADING SPINNER ─────────────────────────────────────────── */
+    .global-spinner {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(8,13,20,.6);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .spinner-ring {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── NOTIFICATION TOAST ─────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--bg-raised); border: 1px solid var(--border-bright);
+      border-radius: 10px; padding: 10px 18px;
+      font-size: 12.5px; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      z-index: 10000; transition: transform .3s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; gap: 8px;
+    }
+    #toast.is-shown { transform: translateX(-50%) translateY(0); }
+    #toast.is-success { border-color: rgba(34,197,94,.4); color: var(--success); }
+    #toast.is-error   { border-color: rgba(239,68,68,.4);  color: var(--danger); }
+
+    /* ── MAP POPUP ───────────────────────────────────────────────── */
+    .maplibregl-popup-content {
+      background: var(--bg-raised) !important;
+      border: 1px solid var(--border-bright) !important;
+      border-radius: 10px !important;
+      color: var(--text-primary) !important;
+      padding: 12px 14px !important;
+      font-family: var(--font-sans) !important;
+      font-size: 12px !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,.5) !important;
+    }
+    .maplibregl-popup-tip { border-top-color: var(--border-bright) !important; }
+    .maplibregl-popup-close-button { color: var(--text-muted) !important; }
+    .popup-name { font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+    .popup-stat { display: flex; justify-content: space-between; gap: 16px; font-size: 11.5px; margin: 3px 0; }
+    .popup-stat-label { color: var(--text-muted); }
+    .popup-stat-val { font-weight: 600; font-family: var(--font-mono); }
+    .popup-link {
+      display: block; margin-top: 8px; text-align: center; font-size: 11px;
+      color: var(--accent); text-decoration: none; cursor: pointer;
+    }
+
+    /* ── GEE STATUS BADGE ────────────────────────────────────────── */
+    .gee-badge {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 10px; color: var(--text-muted);
+    }
+    .gee-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+    .gee-dot.live { background: var(--success); }
+  </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════════════════════════
-       TOP COMMAND HEADER
-  ══════════════════════════════════════════════════════════════ -->
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════ -->
   <header id="app-header" role="banner">
-    <div class="header-brand">
-      <div class="brand-logo" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
         </svg>
       </div>
-      <div class="brand-name">
-        <span class="brand-primary">Aegis</span><span class="brand-accent">APAC</span>
-        <span class="brand-version">v2.0</span>
+      <div>
+        <div class="brand-name">Aegis<span>APAC</span> <span class="brand-version">v2.0</span></div>
       </div>
     </div>
 
-    <div class="header-scenario">
-      <div class="scenario-pill">
-        <span id="status-dot" class="status-dot" aria-label="System status"></span>
-        <span id="scenario-badge-text">Amphan (2020) · Bengal Delta · T-72h Ensemble</span>
-      </div>
-      <span id="demo-mode-tag" class="tag-golden">DEMO MODE · GOLDEN BUNDLE</span>
+    <div class="scenario-pill" style="margin-left:12px">
+      <span id="status-dot" class="status-dot"></span>
+      <span id="scenario-badge-text">Amphan (2020) · Bengal Delta · T-72h Ensemble</span>
     </div>
 
-    <div class="header-info">
-      <div class="header-stat">
-        <span class="stat-label">Requests</span>
-        <span class="stat-val" id="metric-total-req">—</span>
-      </div>
-      <div class="header-stat">
-        <span class="stat-label">p50</span>
-        <span class="stat-val" id="metric-p50">—</span>
-      </div>
-      <div class="header-stat">
-        <span class="stat-label">p95</span>
-        <span class="stat-val" id="metric-p95">—</span>
-      </div>
-      <div class="header-divider" aria-hidden="true"></div>
-      <div class="system-status-group">
-        <span id="gemini-status" class="gemini-status">Template Mode</span>
-        <span class="status-label" id="system-status">Connecting…</span>
-      </div>
-    </div>
+    <span id="demo-mode-tag" class="tag-golden" style="margin-left:8px">DEMO MODE · GOLDEN BUNDLE</span>
 
-    <!-- Global loading spinner -->
-    <div id="global-spinner" class="global-spinner" style="display:none" aria-label="Loading data" role="status">
-      <div class="spinner-ring"></div>
+    <div class="header-metrics">
+      <div class="h-stat">
+        <span class="h-stat-label">Requests</span>
+        <span class="h-stat-val" id="metric-total-req">—</span>
+      </div>
+      <div class="h-stat">
+        <span class="h-stat-label">p50</span>
+        <span class="h-stat-val" id="metric-p50">—</span>
+      </div>
+      <div class="h-stat">
+        <span class="h-stat-label">p95</span>
+        <span class="h-stat-val" id="metric-p95">—</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="gee-badge">
+        <span class="gee-dot" id="gee-dot"></span>
+        <span id="gee-mode-label">GEE —</span>
+      </div>
+      <div class="header-divider"></div>
+      <span id="system-status">Connecting…</span>
     </div>
   </header>
 
-  <!-- ══════════════════════════════════════════════════════════════
-       MAIN LAYOUT: [LEFT CONTROLS] [MAP] [RIGHT INSPECTOR]
-  ══════════════════════════════════════════════════════════════ -->
+  <!-- ═══ WORKSPACE ════════════════════════════════════════════════════ -->
   <div class="workspace" role="main">
 
-    <!-- ── LEFT SIDEBAR ─────────────────────────────────────── -->
-    <aside class="sidebar sidebar-left" aria-label="Scenario controls">
+    <!-- ── LEFT SIDEBAR ─────────────────────────────────────────────── -->
+    <aside class="sidebar" aria-label="Scenario controls">
 
       <!-- Time scrubber -->
       <section class="sidebar-section">
-        <h2 class="section-label">Forecast Lead Time</h2>
-        <div class="time-scrubber">
-          <div class="time-header">
-            <span class="time-label-small">Current window:</span>
-            <strong id="time-display" class="time-value">Landfall (T+0h)</strong>
-          </div>
-          <div class="time-track" role="group" aria-label="Select time step">
-            <button class="time-btn" data-step="-24" onclick="setTimeStep(-24)">−24h</button>
-            <button class="time-btn" data-step="-12" onclick="setTimeStep(-12)">−12h</button>
-            <button class="time-btn" data-step="-6"  onclick="setTimeStep(-6)">−6h</button>
-            <button class="time-btn is-active" data-step="0" onclick="setTimeStep(0)">0h</button>
-            <button class="time-btn" data-step="6"   onclick="setTimeStep(6)">+6h</button>
-          </div>
+        <div class="section-label">Forecast Lead Time</div>
+        <div class="time-header">
+          <span class="time-label-small">Window:</span>
+          <strong id="time-display">Landfall (T+0h)</strong>
+        </div>
+        <div class="time-track" role="group" aria-label="Select time step">
+          <button class="time-btn"      data-step="-24" onclick="setTimeStep(-24)">−24h</button>
+          <button class="time-btn"      data-step="-12" onclick="setTimeStep(-12)">−12h</button>
+          <button class="time-btn"      data-step="-6"  onclick="setTimeStep(-6)">−6h</button>
+          <button class="time-btn is-active" data-step="0" onclick="setTimeStep(0)">0h</button>
+          <button class="time-btn"      data-step="6"   onclick="setTimeStep(6)">+6h</button>
         </div>
       </section>
 
       <!-- Layer toggles -->
       <section class="sidebar-section">
-        <h2 class="section-label">Hazard & Exposure Layers</h2>
+        <div class="section-label">Hazard & Exposure Layers</div>
         <div class="layer-panel">
           <label class="layer-row" for="toggle-flood-03">
             <span class="layer-swatch swatch-amber"></span>
-            <span class="layer-name">Flood P(depth &gt; 0.3 m)</span>
+            <span class="layer-name">Flood P(depth > 0.3 m)</span>
             <div class="toggle-wrap">
-              <input type="checkbox" id="toggle-flood-03" checked
-                     onchange="toggleLayer('flood-03', this.checked)" aria-label="Toggle 0.3m flood layer">
+              <input type="checkbox" id="toggle-flood-03" checked onchange="toggleLayer('flood-03', this.checked)">
               <span class="toggle-track"><span class="toggle-thumb"></span></span>
             </div>
           </label>
           <label class="layer-row" for="toggle-flood-10">
             <span class="layer-swatch swatch-red"></span>
-            <span class="layer-name">Severe P(depth &gt; 1.0 m)</span>
+            <span class="layer-name">Severe P(depth > 1.0 m)</span>
             <div class="toggle-wrap">
-              <input type="checkbox" id="toggle-flood-10" checked
-                     onchange="toggleLayer('flood-10', this.checked)" aria-label="Toggle 1.0m flood layer">
+              <input type="checkbox" id="toggle-flood-10" checked onchange="toggleLayer('flood-10', this.checked)">
               <span class="toggle-track"><span class="toggle-thumb"></span></span>
             </div>
           </label>
@@ -121,8 +680,7 @@
             <span class="layer-swatch swatch-cyan"></span>
             <span class="layer-name">Rainfall Drainage Pathways</span>
             <div class="toggle-wrap">
-              <input type="checkbox" id="toggle-pathways" checked
-                     onchange="toggleLayer('pathways', this.checked)" aria-label="Toggle drainage pathways">
+              <input type="checkbox" id="toggle-pathways" checked onchange="toggleLayer('pathways', this.checked)">
               <span class="toggle-track"><span class="toggle-thumb"></span></span>
             </div>
           </label>
@@ -130,8 +688,7 @@
             <span class="layer-swatch swatch-yellow"></span>
             <span class="layer-name">Critical Infrastructure</span>
             <div class="toggle-wrap">
-              <input type="checkbox" id="toggle-facilities" checked
-                     onchange="toggleLayer('facilities', this.checked)" aria-label="Toggle infrastructure markers">
+              <input type="checkbox" id="toggle-facilities" checked onchange="toggleLayer('facilities', this.checked)">
               <span class="toggle-track"><span class="toggle-thumb"></span></span>
             </div>
           </label>
@@ -140,14 +697,13 @@
 
       <!-- Parametric trigger -->
       <section class="sidebar-section">
-        <h2 class="section-label">Parametric Liquidity Trigger</h2>
+        <div class="section-label">Parametric Liquidity Trigger</div>
         <div class="parametric-card">
-          <select id="parametric-district-select" class="district-select" aria-label="Select district">
+          <select id="parametric-district-select" class="district-select" onchange="onDistrictChange(this.value)">
             <option value="South 24 Parganas">South 24 Parganas</option>
             <option value="Purba Medinipur">Purba Medinipur</option>
             <option value="Kendrapara">Kendrapara</option>
           </select>
-
           <div class="parametric-body">
             <div id="parametric-district-label" class="parametric-region">— Geofence</div>
             <div class="parametric-prob-row">
@@ -155,17 +711,17 @@
               <span class="prob-label">trigger probability</span>
             </div>
             <div id="parametric-payout" class="payout-line">Loading…</div>
-            <div id="parametric-assumption" class="assumption-badge">—</div>
+            <div id="parametric-assumption" class="assumption-badge" style="display:none">⚠ assumption</div>
           </div>
         </div>
       </section>
 
-      <!-- Map legend -->
-      <section class="sidebar-section sidebar-section-last">
-        <h2 class="section-label">Map Legend</h2>
+      <!-- Legend -->
+      <section class="sidebar-section">
+        <div class="section-label">Map Legend</div>
         <div class="legend-list">
-          <div class="legend-row"><span class="legend-swatch" style="background:rgba(239,68,68,0.7)"></span><span>P(&gt;1.0m) Catastrophic</span></div>
-          <div class="legend-row"><span class="legend-swatch" style="background:rgba(249,115,22,0.55)"></span><span>P(&gt;0.3m) Vehicle Blockage</span></div>
+          <div class="legend-row"><span class="legend-swatch" style="background:rgba(239,68,68,.7)"></span><span>P(&gt;1.0m) Catastrophic</span></div>
+          <div class="legend-row"><span class="legend-swatch" style="background:rgba(249,115,22,.55)"></span><span>P(&gt;0.3m) Vehicle Blockage</span></div>
           <div class="legend-row"><span class="legend-swatch" style="background:#06b6d4;height:3px;border-radius:2px"></span><span>Surge / Drainage Pathway</span></div>
           <div class="legend-row"><span class="legend-dot" style="background:#10b981"></span><span>Hospital</span></div>
           <div class="legend-row"><span class="legend-dot" style="background:#ef4444"></span><span>Substation</span></div>
@@ -176,118 +732,93 @@
 
     </aside>
 
-    <!-- ── MAP VIEWPORT ──────────────────────────────────────── -->
-    <main class="map-viewport" aria-label="Hazard map">
+    <!-- ── MAP ──────────────────────────────────────────────────────── -->
+    <main class="map-viewport">
       <div id="map" role="img" aria-label="Bengal Delta cyclone impact probability map"></div>
-
-      <!-- Floating map attribution overlay -->
-      <div class="map-overlay-badge">
-        <span>40-member ensemble · Bengal Delta</span>
-      </div>
+      <div class="map-overlay-badge">40-member ensemble · Bengal Delta</div>
     </main>
 
-    <!-- ── RIGHT SIDEBAR ─────────────────────────────────────── -->
+    <!-- ── RIGHT SIDEBAR ─────────────────────────────────────────────── -->
     <aside class="sidebar sidebar-right" aria-label="Analysis panels">
 
-      <!-- Tab navigation -->
-      <nav class="tab-nav" role="tablist" aria-label="Analysis views">
-        <button class="tab-btn is-active" role="tab" data-tab="cascade"    onclick="switchTab('cascade')"    aria-controls="tab-cascade"    aria-selected="true">Cascade</button>
-        <button class="tab-btn"           role="tab" data-tab="actions"    onclick="switchTab('actions')"    aria-controls="tab-actions"    aria-selected="false">Actions</button>
-        <button class="tab-btn"           role="tab" data-tab="advisories" onclick="switchTab('advisories')" aria-controls="tab-advisories" aria-selected="false">Advisory</button>
-        <button class="tab-btn"           role="tab" data-tab="backtest"   onclick="switchTab('backtest')"   aria-controls="tab-backtest"   aria-selected="false">Backtest</button>
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-btn is-active" role="tab" data-tab="cascade"    onclick="switchTab('cascade')"    aria-selected="true">Cascade</button>
+        <button class="tab-btn"           role="tab" data-tab="actions"    onclick="switchTab('actions')"    aria-selected="false">Actions</button>
+        <button class="tab-btn"           role="tab" data-tab="advisories" onclick="switchTab('advisories')" aria-selected="false">Advisory</button>
+        <button class="tab-btn"           role="tab" data-tab="backtest"   onclick="switchTab('backtest')"   aria-selected="false">Backtest</button>
       </nav>
 
-      <!-- Tab 1: Cascade Inspector -->
-      <div id="tab-cascade" class="tab-panel is-active" role="tabpanel" aria-labelledby="tab-btn-cascade">
+      <!-- Tab 1: Cascade -->
+      <div id="tab-cascade" class="tab-panel is-active" role="tabpanel">
         <div id="facility-detail">
           <div class="empty-state">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
             <p>Click any facility marker on the map to inspect its failure probability, warning lead-time, and cascade dependency chain.</p>
           </div>
         </div>
       </div>
 
-      <!-- Tab 2: Recommended Actions -->
-      <div id="tab-actions" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-actions">
+      <!-- Tab 2: Actions -->
+      <div id="tab-actions" class="tab-panel" role="tabpanel">
         <div class="panel-header">
-          <h2 class="panel-title">Anticipatory Interventions</h2>
-          <span class="panel-sub">Triggered by ensemble decision engine</span>
+          <div class="panel-title">Anticipatory Interventions</div>
+          <div class="panel-sub">Triggered by ensemble decision engine</div>
         </div>
-        <div id="actions-list">
-          <div class="empty-state"><p>Loading recommended actions…</p></div>
-        </div>
+        <div id="actions-list"><div class="empty-state"><p>Loading recommended actions…</p></div></div>
       </div>
 
-      <!-- Tab 3: Advisory Workflow -->
-      <div id="tab-advisories" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-advisories">
+      <!-- Tab 3: Advisory -->
+      <div id="tab-advisories" class="tab-panel" role="tabpanel">
         <div class="panel-header">
-          <h2 class="panel-title">Early-Warning Advisory</h2>
-          <span class="panel-sub" id="advisory-role-label">District Collector / DDMA</span>
+          <div class="panel-title">Early-Warning Advisory</div>
+          <div class="panel-sub" id="advisory-role-label">District Collector / DDMA</div>
         </div>
-
-        <!-- Role selector -->
-        <div class="segmented-control" role="group" aria-label="Select recipient role">
+        <div class="segmented-control">
           <button class="role-btn is-active" data-role="collector"      onclick="switchRole('collector')">Collector</button>
           <button class="role-btn"           data-role="power_operator" onclick="switchRole('power_operator')">Grid Ops</button>
           <button class="role-btn"           data-role="citizens"       onclick="switchRole('citizens')">Citizens</button>
         </div>
-
-        <!-- Language selector -->
-        <div class="lang-selector" role="group" aria-label="Select language">
+        <div class="lang-selector">
           <button class="lang-btn is-active" data-lang="en" onclick="switchLang('en')">EN</button>
           <button class="lang-btn"           data-lang="bn" onclick="switchLang('bn')">বাংলা</button>
           <button class="lang-btn"           data-lang="hi" onclick="switchLang('hi')">हिन्दी</button>
           <button class="lang-btn"           data-lang="or" onclick="switchLang('or')">ଓଡ଼ିଆ</button>
         </div>
-
-        <!-- Advisory content -->
         <div id="advisory-body" class="advisory-body">Loading advisory content…</div>
-
-        <!-- Validation badge -->
         <div class="validation-strip">
           <span class="validation-icon">✓</span>
           <span>Deterministic Validator: PASSED</span>
           <span id="validation-detail" class="validation-detail">—</span>
         </div>
-
-        <!-- Human-in-the-loop approval -->
-        <button id="approve-dispatch-btn" class="approve-btn" onclick="handleApproveAdvisory()"
-                aria-label="Authorize and dispatch advisory">
-          <span class="btn-icon">✓</span> Authorize &amp; Dispatch
+        <button id="approve-dispatch-btn" class="approve-btn" onclick="handleApproveAdvisory()">
+          <span>✓</span> Authorize &amp; Dispatch
         </button>
-
-        <!-- CAP export -->
-        <button class="secondary-btn" onclick="viewCAPModal()"
-                aria-label="View CAP 1.2 XML">
-          <span>&#x2197;</span> Inspect CAP 1.2 XML
+        <button class="secondary-btn" onclick="viewCAPModal()">
+          <span>↗</span> Inspect CAP 1.2 XML
         </button>
       </div>
 
-      <!-- Tab 4: Backtest Metrics -->
-      <div id="tab-backtest" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-backtest">
+      <!-- Tab 4: Backtest -->
+      <div id="tab-backtest" class="tab-panel" role="tabpanel">
         <div class="panel-header">
-          <h2 class="panel-title">72h Pre-Landfall Backtest</h2>
-          <span class="panel-sub">Amphan 2020 · Copernicus EMS Reference</span>
+          <div class="panel-title">72h Pre-Landfall Backtest</div>
+          <div class="panel-sub">Amphan 2020 · Copernicus EMS Reference</div>
         </div>
-
         <div class="backtest-metrics-grid" id="backtest-metrics-grid">
-          <!-- Filled by Renderer.renderBacktest -->
-          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">IoU</div></div>
-          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">F1</div></div>
-          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">Precision</div></div>
-          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">Recall</div></div>
+          <div class="metric-cell"><div class="metric-cell-val" id="bt-iou">—</div><div class="metric-cell-label">IoU</div></div>
+          <div class="metric-cell"><div class="metric-cell-val" id="bt-f1">—</div><div class="metric-cell-label">F1</div></div>
+          <div class="metric-cell"><div class="metric-cell-val" id="bt-prec">—</div><div class="metric-cell-label">Precision</div></div>
+          <div class="metric-cell"><div class="metric-cell-val" id="bt-rec">—</div><div class="metric-cell-label">Recall</div></div>
         </div>
-
-        <div class="section-label" style="margin-top:1.25rem">Benchmark vs Naive Baselines</div>
+        <div class="section-label">Benchmark vs Naive Baselines</div>
         <div class="table-wrapper">
-          <table class="data-table" aria-label="Baseline comparison table">
-            <thead>
-              <tr>
-                <th>Model</th><th>Lead</th><th>FAR</th><th>Prec</th><th>F1</th>
-              </tr>
-            </thead>
+          <table class="data-table">
+            <thead><tr><th>Model</th><th>Lead</th><th>FAR</th><th>Prec</th><th>F1</th></tr></thead>
             <tbody id="baseline-table-body">
-              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading…</td></tr>
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Loading…</td></tr>
             </tbody>
           </table>
         </div>
@@ -296,17 +827,12 @@
     </aside>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════
-       CAP 1.2 XML MODAL
-  ══════════════════════════════════════════════════════════════ -->
-  <div id="cap-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="CAP 1.2 XML payload">
+  <!-- ═══ CAP MODAL ════════════════════════════════════════════════════ -->
+  <div id="cap-modal" class="modal-overlay" role="dialog" aria-modal="true" onclick="closeCAPModal()">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-title">
-          <span class="modal-icon">📡</span>
-          OASIS CAP 1.2 Alert Payload
-        </div>
-        <button class="close-btn" onclick="closeCAPModal()" aria-label="Close CAP modal">✕</button>
+        <div class="modal-title">📡 OASIS CAP 1.2 Alert Payload</div>
+        <button class="close-btn" onclick="closeCAPModal()">✕</button>
       </div>
       <div class="modal-badge-row">
         <span class="tag-golden">CAP 1.2 Compliant</span>
@@ -316,9 +842,18 @@
     </div>
   </div>
 
+  <!-- ═══ TOAST ════════════════════════════════════════════════════════ -->
+  <div id="toast"></div>
+
+  <!-- ═══ GLOBAL SPINNER ═══════════════════════════════════════════════ -->
+  <div id="global-spinner" class="global-spinner" style="display:none">
+    <div class="spinner-ring"></div>
+  </div>
+
   <!-- MapLibre GL JS -->
   <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-  <!-- Application Logic -->
-  <script src="/static/app.js"></script>
+  <!-- App logic — API_BASE overridden below to point at FastAPI on :8000 -->
+  <script>window.__API_BASE = "http://127.0.0.1:8000";</script>
+  <script src="app.js"></script>
 </body>
 </html>
