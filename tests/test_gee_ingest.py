@@ -22,8 +22,8 @@ def test_gee_connection_diagnostics():
     assert "initialized" in status
     assert "mode" in status
     assert "catalog_datasets" in status
-    assert status["catalog_datasets"]["dem"] == "COPERNICUS/DEM/GLO30"
-    assert status["catalog_datasets"]["rainfall"] == "NASA/GPM_L3/IMERG_V06"
+    assert status["catalog_datasets"]["dem"] == "COPERNICUS/DEM/GLO30_2024_1"
+    assert status["catalog_datasets"]["rainfall"] == "NASA/GPM_L3/IMERG_V07"
     assert status["catalog_datasets"]["sentinel1"] == "COPERNICUS/S1_GRD"
 
 

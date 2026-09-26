@@ -17,6 +17,7 @@ env/
 credentials*.json
 secrets/
 .secrets/
+Json file/
 
 # Distribution / packaging
 dist/
