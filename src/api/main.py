@@ -28,6 +28,7 @@ from src.contracts import (
     RiskResult,
     Scenario,
 )
+from src.ingest.gee import EarthEngineIngest
 
 app = FastAPI(
     title="Aegis-APAC API",
@@ -133,6 +134,7 @@ def verify_operator_token(
 def health_check():
     """System health check and component operational mode."""
     bundle_ok = (GOLDEN_DIR / "scenario.json").is_file()
+    gee_diag = EarthEngineIngest().check_connection()
     return {
         "status": "healthy" if bundle_ok else "degraded",
         "demo_mode": DEMO_MODE,
@@ -142,10 +144,23 @@ def health_check():
             "golden_bundle": "ready" if bundle_ok else "missing",
             "degraded_template_fallback": "active",
             "gemini_api": "configured" if os.getenv("GEMINI_API_KEY") else "degraded_template_mode",
+            "earth_engine": gee_diag["mode"],
             "database_cache": "in_memory_sqlite_ok",
+        },
+        "earth_engine": {
+            "mode": gee_diag["mode"],
+            "authenticated": gee_diag["initialized"],
+            "auth_method": gee_diag["auth_method"],
+            "project_id": gee_diag["project_id"],
         },
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+
+
+@app.get("/api/v1/gee/status", tags=["Earth Engine"])
+def get_gee_status():
+    """Return status of Google Earth Engine batch ingestion readiness and datasets."""
+    return EarthEngineIngest().check_connection()
 
 
 @app.get("/metrics", tags=["System"])

@@ -72,10 +72,15 @@ class CascadeEngine:
             if water_depth_m >= thresh:
                 return True, f"Substation switchgear inundated by {water_depth_m:.2f}m (threshold >= {thresh}m)"
 
-        elif facility_type in (FacilityType.ROAD_SEGMENT, FacilityType.BRIDGE):
+        elif facility_type == FacilityType.ROAD_SEGMENT:
             thresh = self.thresholds["road_blockage_depth_light_vehicle_m"]
             if water_depth_m >= thresh:
                 return True, f"Roadway submerged under {water_depth_m:.2f}m floodwater (impassable >= {thresh}m)"
+
+        elif facility_type == FacilityType.BRIDGE:
+            thresh = self.thresholds["bridge_failure_depth_m"]
+            if water_depth_m >= thresh:
+                return True, f"Bridge approach road submerged under {water_depth_m:.2f}m floodwater (impassable >= {thresh}m)"
 
         elif facility_type == FacilityType.HOSPITAL:
             thresh = self.thresholds["hospital_impairment_depth_m"]

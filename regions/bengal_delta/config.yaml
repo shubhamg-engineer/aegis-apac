@@ -43,9 +43,11 @@ cascade_defaults:
   substation_failure_depth_m: 0.4
   road_blockage_depth_light_vehicle_m: 0.3
   road_blockage_depth_heavy_vehicle_m: 0.6
+  bridge_failure_depth_m: 0.6
   hospital_impairment_depth_m: 0.3
   hospital_default_backup_power_hours: 8
   shelter_unusable_depth_m: 0.15
+  telecom_failure_depth_m: 0.5
   telecom_default_battery_hours: 4
 
 data_sources:
@@ -53,11 +55,11 @@ data_sources:
     provider: "IBTrACS"
     licence: "Public Domain (NOAA)"
   dem:
-    dataset_id: "COPERNICUS/DEM/GLO30"
+    dataset_id: "COPERNICUS/DEM/GLO30_2024_1"  # superseded COPERNICUS/DEM/GLO30
     resolution_m: 30
     licence: "Open Data (ESA / Copernicus)"
   rainfall:
-    dataset_id: "NASA/GPM_L3/IMERG_V06"
+    dataset_id: "NASA/GPM_L3/IMERG_V07"  # superseded NASA/GPM_L3/IMERG_V06
     licence: "NASA Open Data"
   infrastructure:
     provider: "OpenStreetMap"

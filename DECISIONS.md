@@ -192,3 +192,21 @@ This log documents foundational choices, data sources, assumptions, and known ph
   * `docs/slide_deck.md`: 10-slide presentation deck.
   * `docs/digital_public_good.md`: DPG standard alignment, open licensing (MIT), and standard formats (CAP 1.2, GeoJSON, COG).
   * `docs/judges_faq.md`: Technical FAQ covering physics tradeoffs, LLM guardrails, and APAC scalability.
+
+---
+
+## 13. Google Earth Engine (GEE) Satellite Ingestion & Authentication Architecture
+
+* **Compliance with Hard Rule 6 ("Precompute, then serve"):**
+  * Live Earth Engine calls are strictly isolated to offline batch ingestion (`src/ingest/gee.py` and `src/ingest/pipeline.py`).
+  * The FastAPI web service and interactive frontend never execute per-request Earth Engine calls.
+  * When running without credentials or offline, the engine activates a zero-failure fallback using precomputed/calibrated local layers.
+* **Earth Engine Catalogs Verified & Integrated:**
+  1. **Copernicus DEM GLO-30 (`COPERNICUS/DEM/GLO30`):** 30m Digital Surface Model and coastal sea-mask extraction.
+  2. **NASA GPM IMERG (`NASA/GPM_L3/IMERG_V06`):** Half-hourly and cumulative precipitation grids across cyclone lead-time horizons.
+  3. **Copernicus Sentinel-1 SAR (`COPERNICUS/S1_GRD`):** Empirical SAR flood extent mapping using VV backscatter change detection (specular reflection drop $\le -3.0\text{ dB}$).
+* **Service Account Authentication:**
+  * Supports Google Service Account credentials via `EE_SERVICE_ACCOUNT_JSON`, `GOOGLE_APPLICATION_CREDENTIALS`, or auto-detection of `*service_account*.json` / `*gee*.json` in root or `secrets/`.
+  * Credentials automatically extract `client_email` and `project_id` and initialize `ee.ServiceAccountCredentials`.
+  * `.gitignore` updated to guarantee service account keys and credentials are never committed.
+

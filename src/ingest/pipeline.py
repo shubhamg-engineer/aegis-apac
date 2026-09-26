@@ -14,6 +14,7 @@ from typing import Any, Dict
 import numpy as np
 import yaml
 
+from src.ingest.gee import EarthEngineIngest
 from src.ingest.ibtracs import IBTrACSIngest
 from src.ingest.osm import OSMIngest
 from src.ingest.rainfall import RainfallIngest
@@ -51,7 +52,13 @@ def write_layer_with_meta(
     meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
 
-def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020", output_base: Path = None):
+def run_pipeline(
+    region_id: str = "bengal_delta",
+    storm_name: str = "amphan_2020",
+    output_base: Path = None,
+    use_gee: bool = True,
+    key_file: str = None,
+):
     repo_root = Path(__file__).resolve().parent.parent.parent
     config_file = repo_root / "regions" / region_id / "config.yaml"
     
@@ -67,10 +74,17 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
     print(f"=== Running Aegis-APAC Data Ingestion Pipeline ===")
     print(f"Region: {region_id} ({config['region']['name']})")
     print(f"Storm:  {storm_name}")
-    print(f"Output: {out_dir}\n")
+    print(f"Output: {out_dir}")
+    print(f"GEE:    {'Enabled' if use_gee else 'Disabled (local fallback)'}\n")
+
+    # Initialize GEE if requested
+    gee_client = EarthEngineIngest(service_account_json=key_file) if use_gee else None
+    if gee_client:
+        status = gee_client.check_connection()
+        print(f"GEE Status: {status['mode']} (Authenticated: {status['initialized']}, Method: {status['auth_method']})")
 
     # 1. Storm Track (IBTrACS)
-    print("1/5 Ingesting storm track (IBTrACS)...")
+    print("1/6 Ingesting storm track (IBTrACS)...")
     track_points = IBTrACSIngest.get_track(storm_name)
     track_geojson = IBTrACSIngest.export_geojson(track_points)
     write_layer_with_meta(
@@ -85,7 +99,7 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
     )
 
     # 2. Critical Infrastructure & Dependencies (OSM)
-    print("2/5 Ingesting critical infrastructure & building graph (OSM)...")
+    print("2/6 Ingesting critical infrastructure & building graph (OSM)...")
     facilities = OSMIngest.extract_facilities()
     edges = OSMIngest.infer_dependency_edges(facilities)
     
@@ -115,7 +129,7 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
     )
 
     # 3. Terrain, Sea Mask & Hydrology (Copernicus DEM)
-    print("3/5 Ingesting terrain & deriving D8 flow accumulation (Copernicus DEM GLO-30)...")
+    print("3/6 Ingesting terrain & deriving D8 flow accumulation (Copernicus DEM GLO-30)...")
     aoi = config["aoi"]
     terrain_hydrology = TerrainHydrology(
         min_lon=aoi["min_lon"],
@@ -123,12 +137,22 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
         max_lon=aoi["max_lon"],
         max_lat=aoi["max_lat"],
     )
-    dem_grid = terrain_hydrology.generate_dem_grid()
+
+    if gee_client:
+        dem_grid = gee_client.extract_copernicus_dem(
+            min_lon=aoi["min_lon"],
+            min_lat=aoi["min_lat"],
+            max_lon=aoi["max_lon"],
+            max_lat=aoi["max_lat"],
+        )
+    else:
+        dem_grid = terrain_hydrology.generate_dem_grid()
+
     write_layer_with_meta(
         data_path=out_dir / "dem_elevation.npz",
         data_obj=dem_grid,
         layer_name="Copernicus DEM Surface Model & Sea Mask",
-        source="ESA / Copernicus DEM GLO-30",
+        source=f"ESA / Copernicus DEM GLO-30 ({dem_grid.get('source_type', 'Direct')})",
         licence=config["data_sources"]["dem"]["licence"],
         resolution="30m nominal (resampled grid)",
         crs="EPSG:4326 / UTM Zone 45N",
@@ -136,7 +160,7 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
     )
     
     # 4. Drainage Pathways GeoJSON
-    print("4/5 Delineating drainage channels and surge funnels...")
+    print("4/6 Delineating drainage channels and surge funnels...")
     pathways = terrain_hydrology.extract_drainage_pathways()
     write_layer_with_meta(
         data_path=out_dir / "drainage_pathways.geojson",
@@ -150,14 +174,24 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
     )
 
     # 5. Precipitation (NASA GPM IMERG)
-    print("5/5 Ingesting rainfall accumulation fields (NASA GPM IMERG)...")
+    print("5/6 Ingesting rainfall accumulation fields (NASA GPM IMERG)...")
     landfall = IBTrACSIngest.get_landfall_point(storm_name)
-    rainfall_grids = RainfallIngest.generate_rainfall_grids(
-        lons=dem_grid["lons"],
-        lats=dem_grid["lats"],
-        storm_landfall_lon=landfall.longitude,
-        storm_landfall_lat=landfall.latitude,
-    )
+    if gee_client:
+        rainfall_grids = gee_client.extract_gpm_rainfall(
+            lons=dem_grid["lons"],
+            lats=dem_grid["lats"],
+            storm_name=storm_name,
+            landfall_lon=landfall.longitude,
+            landfall_lat=landfall.latitude,
+        )
+    else:
+        rainfall_grids = RainfallIngest.generate_rainfall_grids(
+            lons=dem_grid["lons"],
+            lats=dem_grid["lats"],
+            storm_landfall_lon=landfall.longitude,
+            storm_landfall_lat=landfall.latitude,
+        )
+
     write_layer_with_meta(
         data_path=out_dir / "rainfall_accumulation.npz",
         data_obj={str(k): v for k, v in rainfall_grids.items()},
@@ -169,7 +203,32 @@ def run_pipeline(region_id: str = "bengal_delta", storm_name: str = "amphan_2020
         attribution="NASA Goddard Space Flight Center / GPM Science Team",
     )
 
-    print(f"\n[OK] Pipeline complete! All layers successfully generated in: {out_dir}")
+    # 6. Sentinel-1 SAR Flood Reference (Earth Engine)
+    print("6/6 Extracting Sentinel-1 SAR flood reference (COPERNICUS/S1_GRD)...")
+    if gee_client:
+        s1_reference = gee_client.extract_sentinel1_flood_extent(
+            storm_name=storm_name,
+            min_lon=aoi["min_lon"],
+            min_lat=aoi["min_lat"],
+            max_lon=aoi["max_lon"],
+            max_lat=aoi["max_lat"],
+        )
+    else:
+        fallback_gee = EarthEngineIngest(service_account_json=key_file)
+        s1_reference = fallback_gee.extract_sentinel1_flood_extent(storm_name=storm_name)
+
+    write_layer_with_meta(
+        data_path=out_dir / f"sentinel1_flood_reference_{storm_name}.geojson",
+        data_obj=s1_reference,
+        layer_name=f"Sentinel-1 SAR Flood Reference Extents ({storm_name})",
+        source="Copernicus Sentinel-1 SAR GRD / Backscatter Change Detection",
+        licence="Open Access (ESA / Copernicus)",
+        resolution="10m nominal SAR resolution",
+        crs="EPSG:4326",
+        attribution="European Space Agency (ESA) Copernicus Sentinel-1 Programme",
+    )
+
+    print(f"\n[OK] Pipeline complete! All 6 layers successfully generated in: {out_dir}")
     return out_dir
 
 
@@ -177,6 +236,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aegis-APAC Data Ingestion Pipeline")
     parser.add_argument("--region", default="bengal_delta", help="Region identifier")
     parser.add_argument("--storm", default="amphan_2020", help="Storm identifier")
+    parser.add_argument("--key-file", default=None, help="Path to Google Service Account JSON key file")
+    parser.add_argument("--no-gee", action="store_true", help="Disable GEE and use local synthetic generators")
     args = parser.parse_args()
     
-    run_pipeline(region_id=args.region, storm_name=args.storm)
+    run_pipeline(
+        region_id=args.region,
+        storm_name=args.storm,
+        use_gee=not args.no_gee,
+        key_file=args.key_file,
+    )

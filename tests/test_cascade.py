@@ -189,3 +189,33 @@ def test_ensemble_cascade_output_contracts(toy_infrastructure_network):
 
     # Results are ranked by failure probability descending
     assert results[0].failure_probability >= results[-1].failure_probability
+
+
+def test_bridge_uses_bridge_threshold_not_road_threshold():
+    """Bridge facility must use bridge_failure_depth_m (0.6m), not road_blockage_depth_light_vehicle_m (0.3m).
+    This guards against the regression where BRIDGE was grouped with ROAD_SEGMENT and failed too early."""
+    engine = CascadeEngine()
+    bridge = Facility(
+        id="bridge_hatania",
+        type=FacilityType.BRIDGE,
+        name="Hatania-Doania Estuary Bridge",
+        geometry={"type": "Point", "coordinates": [88.24, 21.77]},
+        elevation_m=4.8,
+        attributes={"max_tonnage": 40},
+    )
+    G = engine.build_graph([bridge], [])
+
+    # At 0.45m: below bridge threshold (0.6m) but above road light-vehicle threshold (0.3m)
+    # Bridge must NOT fail at 0.45m
+    state_low = engine.simulate_member(G, [0], {0: {"bridge_hatania": 0.45}})
+    assert state_low["bridge_hatania"]["failed"] is False, (
+        "Bridge incorrectly failed at 0.45m (bridge threshold is 0.6m; road threshold should not apply)"
+    )
+
+    # At 0.70m: above bridge threshold (0.6m); bridge must fail
+    state_high = engine.simulate_member(G, [0], {0: {"bridge_hatania": 0.70}})
+    assert state_high["bridge_hatania"]["failed"] is True, (
+        "Bridge did not fail at 0.70m (expected failure above 0.6m bridge_failure_depth_m threshold)"
+    )
+    assert "Bridge approach road" in state_high["bridge_hatania"]["cause"]
+

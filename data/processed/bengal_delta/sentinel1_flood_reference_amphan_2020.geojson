@@ -1,0 +1,151 @@
+{
+  "type": "FeatureCollection",
+  "name": "sentinel1_flood_reference_amphan_2020",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "flood_zone_sagar_east",
+        "satellite": "Sentinel-1A / Sentinel-1B C-SAR",
+        "instrument_mode": "IW",
+        "polarization": "VV",
+        "sensor": "C-band Synthetic Aperture Radar (5.405 GHz)",
+        "acquisition_date": "2020-05-21",
+        "backscatter_drop_db": -4.2,
+        "location_name": "Sagar Island Eastern Inundation Zone",
+        "validation_source": "Copernicus EMS EMSR439 / Sentinel-1 GRD"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.08,
+              21.62
+            ],
+            [
+              88.16,
+              21.62
+            ],
+            [
+              88.15,
+              21.72
+            ],
+            [
+              88.06,
+              21.7
+            ],
+            [
+              88.08,
+              21.62
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "flood_zone_namkhana_bakkhali",
+        "satellite": "Sentinel-1A / Sentinel-1B C-SAR",
+        "instrument_mode": "IW",
+        "polarization": "VV",
+        "sensor": "C-band Synthetic Aperture Radar (5.405 GHz)",
+        "acquisition_date": "2020-05-21",
+        "backscatter_drop_db": -5.1,
+        "location_name": "Namkhana & Bakkhali Coastal Embankment Breach",
+        "validation_source": "Copernicus EMS EMSR439 / Sentinel-1 GRD"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.22,
+              21.56
+            ],
+            [
+              88.32,
+              21.56
+            ],
+            [
+              88.31,
+              21.66
+            ],
+            [
+              88.2,
+              21.65
+            ],
+            [
+              88.22,
+              21.56
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "flood_zone_gosaba_sundarbans",
+        "satellite": "Sentinel-1A / Sentinel-1B C-SAR",
+        "instrument_mode": "IW",
+        "polarization": "VV",
+        "sensor": "C-band Synthetic Aperture Radar (5.405 GHz)",
+        "acquisition_date": "2020-05-21",
+        "backscatter_drop_db": -3.8,
+        "location_name": "Gosaba / Sundarbans Tidal Creek Inundation",
+        "validation_source": "Copernicus EMS EMSR439 / Sentinel-1 GRD"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              88.75,
+              22.12
+            ],
+            [
+              88.88,
+              22.14
+            ],
+            [
+              88.87,
+              22.25
+            ],
+            [
+              88.74,
+              22.22
+            ],
+            [
+              88.75,
+              22.12
+            ]
+          ]
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "satellite_mission": "Copernicus Sentinel-1 SAR",
+    "dataset_id": "COPERNICUS/S1_GRD",
+    "polarization": "VV",
+    "pre_event_window": [
+      "2020-05-01",
+      "2020-05-15"
+    ],
+    "post_event_window": [
+      "2020-05-21",
+      "2020-05-26"
+    ],
+    "detection_threshold_db": -3.0,
+    "total_flooded_polygons": 3,
+    "generated_at": "2026-09-26T10:35:21.265155+00:00"
+  }
+}

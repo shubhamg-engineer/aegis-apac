@@ -3,244 +3,322 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aegis-APAC: Cyclone Impact & Anticipatory Action Platform</title>
-  
-  <!-- Google Fonts: Inter -->
+  <title>Aegis-APAC — Anticipatory Cyclone Impact Platform</title>
+  <meta name="description" content="Anticipatory action and cyclone impact platform for coastal APAC. Ensemble-based probabilistic flood forecasting, infrastructure cascade analysis, and multilingual early-warning advisories for the Bengal Delta region.">
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <!-- MapLibre GL CSS -->
-  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
-  
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
+
   <!-- Application CSS -->
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
-  <header>
-    <div class="brand">
-      <div class="brand-logo">A</div>
-      <div class="brand-title">Aegis<span>APAC</span></div>
-      <div class="scenario-badge">
-        <span class="status-dot"></span>
-        <span>Amphan (2020) T-72h Ensemble</span>
+  <!-- ══════════════════════════════════════════════════════════════
+       TOP COMMAND HEADER
+  ══════════════════════════════════════════════════════════════ -->
+  <header id="app-header" role="banner">
+    <div class="header-brand">
+      <div class="brand-logo" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
       </div>
-      <span class="tag-golden">DEMO_MODE: GOLDEN BUNDLE</span>
+      <div class="brand-name">
+        <span class="brand-primary">Aegis</span><span class="brand-accent">APAC</span>
+        <span class="brand-version">v2.0</span>
+      </div>
     </div>
-    
-    <div class="header-meta">
-      <div>Region: <strong>Bengal Delta (West Bengal / Odisha)</strong></div>
-      <div>Ensemble: <strong>40 Members</strong></div>
-      <div id="system-status" style="color: #34d399;">● System Healthy</div>
+
+    <div class="header-scenario">
+      <div class="scenario-pill">
+        <span id="status-dot" class="status-dot" aria-label="System status"></span>
+        <span id="scenario-badge-text">Amphan (2020) · Bengal Delta · T-72h Ensemble</span>
+      </div>
+      <span id="demo-mode-tag" class="tag-golden">DEMO MODE · GOLDEN BUNDLE</span>
+    </div>
+
+    <div class="header-info">
+      <div class="header-stat">
+        <span class="stat-label">Requests</span>
+        <span class="stat-val" id="metric-total-req">—</span>
+      </div>
+      <div class="header-stat">
+        <span class="stat-label">p50</span>
+        <span class="stat-val" id="metric-p50">—</span>
+      </div>
+      <div class="header-stat">
+        <span class="stat-label">p95</span>
+        <span class="stat-val" id="metric-p95">—</span>
+      </div>
+      <div class="header-divider" aria-hidden="true"></div>
+      <div class="system-status-group">
+        <span id="gemini-status" class="gemini-status">Template Mode</span>
+        <span class="status-label" id="system-status">Connecting…</span>
+      </div>
+    </div>
+
+    <!-- Global loading spinner -->
+    <div id="global-spinner" class="global-spinner" style="display:none" aria-label="Loading data" role="status">
+      <div class="spinner-ring"></div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <div class="app-container">
-    
-    <!-- Left Sidebar: Scenario Controls -->
-    <aside class="sidebar-left">
-      <div>
-        <div class="section-title">Forecast Lead Time</div>
-        <div class="control-card">
-          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.4rem;">
-            <span>Current Step:</span>
-            <strong id="time-display" style="color: var(--accent-cyan);">Landfall (T+0h)</strong>
+  <!-- ══════════════════════════════════════════════════════════════
+       MAIN LAYOUT: [LEFT CONTROLS] [MAP] [RIGHT INSPECTOR]
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="workspace" role="main">
+
+    <!-- ── LEFT SIDEBAR ─────────────────────────────────────── -->
+    <aside class="sidebar sidebar-left" aria-label="Scenario controls">
+
+      <!-- Time scrubber -->
+      <section class="sidebar-section">
+        <h2 class="section-label">Forecast Lead Time</h2>
+        <div class="time-scrubber">
+          <div class="time-header">
+            <span class="time-label-small">Current window:</span>
+            <strong id="time-display" class="time-value">Landfall (T+0h)</strong>
           </div>
-          <div class="time-steps">
-            <button class="time-btn" onclick="setTimeStep(-24)">-24h</button>
-            <button class="time-btn" onclick="setTimeStep(-12)">-12h</button>
-            <button class="time-btn" onclick="setTimeStep(-6)">-6h</button>
-            <button class="time-btn active" onclick="setTimeStep(0)">0h</button>
-            <button class="time-btn" onclick="setTimeStep(6)">+6h</button>
+          <div class="time-track" role="group" aria-label="Select time step">
+            <button class="time-btn" data-step="-24" onclick="setTimeStep(-24)">−24h</button>
+            <button class="time-btn" data-step="-12" onclick="setTimeStep(-12)">−12h</button>
+            <button class="time-btn" data-step="-6"  onclick="setTimeStep(-6)">−6h</button>
+            <button class="time-btn is-active" data-step="0" onclick="setTimeStep(0)">0h</button>
+            <button class="time-btn" data-step="6"   onclick="setTimeStep(6)">+6h</button>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div>
-        <div class="section-title">Hazard & Exposure Layers</div>
-        <div class="control-card">
-          <div class="layer-toggle">
-            <span>Flood P(depth > 0.3m)</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="toggle-flood-03" checked onchange="toggleLayer('flood-03', this.checked)">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="layer-toggle">
-            <span>Severe Flood P(depth > 1.0m)</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="toggle-flood-10" checked onchange="toggleLayer('flood-10', this.checked)">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="layer-toggle">
-            <span>Rainfall Damage Pathways</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="toggle-pathways" checked onchange="toggleLayer('pathways', this.checked)">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="layer-toggle">
-            <span>Critical Infrastructure</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="toggle-facilities" checked onchange="toggleLayer('facilities', this.checked)">
-              <span class="slider"></span>
-            </label>
-          </div>
+      <!-- Layer toggles -->
+      <section class="sidebar-section">
+        <h2 class="section-label">Hazard & Exposure Layers</h2>
+        <div class="layer-panel">
+          <label class="layer-row" for="toggle-flood-03">
+            <span class="layer-swatch swatch-amber"></span>
+            <span class="layer-name">Flood P(depth &gt; 0.3 m)</span>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="toggle-flood-03" checked
+                     onchange="toggleLayer('flood-03', this.checked)" aria-label="Toggle 0.3m flood layer">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
+          <label class="layer-row" for="toggle-flood-10">
+            <span class="layer-swatch swatch-red"></span>
+            <span class="layer-name">Severe P(depth &gt; 1.0 m)</span>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="toggle-flood-10" checked
+                     onchange="toggleLayer('flood-10', this.checked)" aria-label="Toggle 1.0m flood layer">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
+          <label class="layer-row" for="toggle-pathways">
+            <span class="layer-swatch swatch-cyan"></span>
+            <span class="layer-name">Rainfall Drainage Pathways</span>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="toggle-pathways" checked
+                     onchange="toggleLayer('pathways', this.checked)" aria-label="Toggle drainage pathways">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
+          <label class="layer-row" for="toggle-facilities">
+            <span class="layer-swatch swatch-yellow"></span>
+            <span class="layer-name">Critical Infrastructure</span>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="toggle-facilities" checked
+                     onchange="toggleLayer('facilities', this.checked)" aria-label="Toggle infrastructure markers">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
         </div>
-      </div>
+      </section>
 
-      <div>
-        <div class="section-title">Parametric Liquidity Trigger</div>
-        <div class="parametric-box">
-          <select id="parametric-district-select" onchange="updateParametricView(this.value)" style="width: 100%; background: #0f172a; border: 1px solid var(--border-color); color: #fff; padding: 0.35rem 0.5rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 0.6rem; cursor: pointer;">
-            <option value="South 24 Parganas" selected>South 24 Parganas</option>
+      <!-- Parametric trigger -->
+      <section class="sidebar-section">
+        <h2 class="section-label">Parametric Liquidity Trigger</h2>
+        <div class="parametric-card">
+          <select id="parametric-district-select" class="district-select" aria-label="Select district">
+            <option value="South 24 Parganas">South 24 Parganas</option>
             <option value="Purba Medinipur">Purba Medinipur</option>
             <option value="Kendrapara">Kendrapara</option>
           </select>
-          <div id="parametric-district-name" style="font-size: 0.75rem; text-transform: uppercase; color: #a7f3d0; font-weight: 700;">South 24 Parganas Geofence</div>
-          <div class="metric-value" id="parametric-prob">84% Probability</div>
-          <div class="metric-sub" id="parametric-payout">Trigger Condition Met: <strong>$2,000,000 Early Payout</strong></div>
-          <div class="assumption-badge" id="parametric-basis-risk" style="margin-top: 0.5rem;">
-            ⚠ assumption: true (Historical flood correlation 0.958, False positive risk 4.2%)
+
+          <div class="parametric-body">
+            <div id="parametric-district-label" class="parametric-region">— Geofence</div>
+            <div class="parametric-prob-row">
+              <span id="parametric-prob" class="prob-big">—%</span>
+              <span class="prob-label">trigger probability</span>
+            </div>
+            <div id="parametric-payout" class="payout-line">Loading…</div>
+            <div id="parametric-assumption" class="assumption-badge">—</div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- Map legend -->
+      <section class="sidebar-section sidebar-section-last">
+        <h2 class="section-label">Map Legend</h2>
+        <div class="legend-list">
+          <div class="legend-row"><span class="legend-swatch" style="background:rgba(239,68,68,0.7)"></span><span>P(&gt;1.0m) Catastrophic</span></div>
+          <div class="legend-row"><span class="legend-swatch" style="background:rgba(249,115,22,0.55)"></span><span>P(&gt;0.3m) Vehicle Blockage</span></div>
+          <div class="legend-row"><span class="legend-swatch" style="background:#06b6d4;height:3px;border-radius:2px"></span><span>Surge / Drainage Pathway</span></div>
+          <div class="legend-row"><span class="legend-dot" style="background:#10b981"></span><span>Hospital</span></div>
+          <div class="legend-row"><span class="legend-dot" style="background:#ef4444"></span><span>Substation</span></div>
+          <div class="legend-row"><span class="legend-dot" style="background:#3b82f6"></span><span>Shelter</span></div>
+          <div class="legend-row"><span class="legend-dot" style="background:#f59e0b"></span><span>Bridge / Road</span></div>
+        </div>
+      </section>
+
     </aside>
 
-    <!-- Center: Map Viewport -->
-    <main class="map-container">
-      <div id="map"></div>
-      
-      <!-- Interactive Legend -->
-      <div class="map-legend">
-        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #cbd5e1;">Map Legend</div>
-        <div class="legend-item">
-          <div class="color-swatch" style="background: rgba(239, 68, 68, 0.6); border: 1px solid #ef4444;"></div>
-          <span>P(depth > 1.0m) Catastrophic Inundation</span>
-        </div>
-        <div class="legend-item">
-          <div class="color-swatch" style="background: rgba(249, 115, 22, 0.4); border: 1px solid #f97316;"></div>
-          <span>P(depth > 0.3m) Vehicle Blockage Hazard</span>
-        </div>
-        <div class="legend-item">
-          <div class="color-swatch" style="background: #06b6d4; height: 3px;"></div>
-          <span>Surge Funnel / DEM Drainage Pathway</span>
-        </div>
-        <div class="legend-item">
-          <div class="color-swatch" style="background: #facc15; border-radius: 50%;"></div>
-          <span>Critical Facility (Hospital / Substation / Shelter)</span>
-        </div>
+    <!-- ── MAP VIEWPORT ──────────────────────────────────────── -->
+    <main class="map-viewport" aria-label="Hazard map">
+      <div id="map" role="img" aria-label="Bengal Delta cyclone impact probability map"></div>
+
+      <!-- Floating map attribution overlay -->
+      <div class="map-overlay-badge">
+        <span>40-member ensemble · Bengal Delta</span>
       </div>
     </main>
 
-    <!-- Right Sidebar: Inspector, Actions, Advisories, Backtest -->
-    <aside class="sidebar-right">
-      <nav class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('cascade')">Cascade Graph</button>
-        <button class="tab-btn" onclick="switchTab('actions')">Actions</button>
-        <button class="tab-btn" onclick="switchTab('advisories')">Advisories</button>
-        <button class="tab-btn" onclick="switchTab('backtest')">Backtest</button>
+    <!-- ── RIGHT SIDEBAR ─────────────────────────────────────── -->
+    <aside class="sidebar sidebar-right" aria-label="Analysis panels">
+
+      <!-- Tab navigation -->
+      <nav class="tab-nav" role="tablist" aria-label="Analysis views">
+        <button class="tab-btn is-active" role="tab" data-tab="cascade"    onclick="switchTab('cascade')"    aria-controls="tab-cascade"    aria-selected="true">Cascade</button>
+        <button class="tab-btn"           role="tab" data-tab="actions"    onclick="switchTab('actions')"    aria-controls="tab-actions"    aria-selected="false">Actions</button>
+        <button class="tab-btn"           role="tab" data-tab="advisories" onclick="switchTab('advisories')" aria-controls="tab-advisories" aria-selected="false">Advisory</button>
+        <button class="tab-btn"           role="tab" data-tab="backtest"   onclick="switchTab('backtest')"   aria-controls="tab-backtest"   aria-selected="false">Backtest</button>
       </nav>
 
-      <!-- Tab 1: Cascade Graph & Facility Inspector -->
-      <div id="tab-cascade" class="tab-content active">
+      <!-- Tab 1: Cascade Inspector -->
+      <div id="tab-cascade" class="tab-panel is-active" role="tabpanel" aria-labelledby="tab-btn-cascade">
         <div id="facility-detail">
-          <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 2rem;">
-            Click on any facility marker on the map to inspect its failure probability, warning hours, and cascade dependency chain.
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <p>Click any facility marker on the map to inspect its failure probability, warning lead-time, and cascade dependency chain.</p>
           </div>
         </div>
       </div>
 
       <!-- Tab 2: Recommended Actions -->
-      <div id="tab-actions" class="tab-content">
-        <div class="section-title">Anticipatory Interventions</div>
-        <div id="actions-list">Loading recommended actions...</div>
+      <div id="tab-actions" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-actions">
+        <div class="panel-header">
+          <h2 class="panel-title">Anticipatory Interventions</h2>
+          <span class="panel-sub">Triggered by ensemble decision engine</span>
+        </div>
+        <div id="actions-list">
+          <div class="empty-state"><p>Loading recommended actions…</p></div>
+        </div>
       </div>
 
-      <!-- Tab 3: Advisory Generator & Approval -->
-      <div id="tab-advisories" class="tab-content">
-        <div class="section-title">Recipient Operational Role</div>
-        <div class="role-selector" style="display: flex; gap: 0.4rem; margin-bottom: 0.75rem;">
-          <button class="time-btn active" id="role-collector" onclick="switchRole('collector')">Collector</button>
-          <button class="time-btn" id="role-power_operator" onclick="switchRole('power_operator')">Grid Operator</button>
-          <button class="time-btn" id="role-citizens" onclick="switchRole('citizens')">Citizens</button>
+      <!-- Tab 3: Advisory Workflow -->
+      <div id="tab-advisories" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-advisories">
+        <div class="panel-header">
+          <h2 class="panel-title">Early-Warning Advisory</h2>
+          <span class="panel-sub" id="advisory-role-label">District Collector / DDMA</span>
         </div>
 
-        <div class="section-title">Language Selection</div>
-        <div class="lang-selector">
-          <button class="lang-btn active" onclick="switchLang('en')">English</button>
-          <button class="lang-btn" onclick="switchLang('bn')">বাংলা</button>
-          <button class="lang-btn" onclick="switchLang('hi')">हिन्दी</button>
-          <button class="lang-btn" onclick="switchLang('or')">ଓଡ଼ିଆ</button>
+        <!-- Role selector -->
+        <div class="segmented-control" role="group" aria-label="Select recipient role">
+          <button class="role-btn is-active" data-role="collector"      onclick="switchRole('collector')">Collector</button>
+          <button class="role-btn"           data-role="power_operator" onclick="switchRole('power_operator')">Grid Ops</button>
+          <button class="role-btn"           data-role="citizens"       onclick="switchRole('citizens')">Citizens</button>
         </div>
 
-        <div style="margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--text-secondary);">
-          Target Role: <strong id="advisory-role" style="color: var(--accent-cyan);">District Collector / DDMA</strong>
+        <!-- Language selector -->
+        <div class="lang-selector" role="group" aria-label="Select language">
+          <button class="lang-btn is-active" data-lang="en" onclick="switchLang('en')">EN</button>
+          <button class="lang-btn"           data-lang="bn" onclick="switchLang('bn')">বাংলা</button>
+          <button class="lang-btn"           data-lang="hi" onclick="switchLang('hi')">हिन्दी</button>
+          <button class="lang-btn"           data-lang="or" onclick="switchLang('or')">ଓଡ଼ିଆ</button>
         </div>
 
-        <div id="advisory-text" class="advisory-preview">
-          Loading advisory content...
+        <!-- Advisory content -->
+        <div id="advisory-body" class="advisory-body">Loading advisory content…</div>
+
+        <!-- Validation badge -->
+        <div class="validation-strip">
+          <span class="validation-icon">✓</span>
+          <span>Deterministic Validator: PASSED</span>
+          <span id="validation-detail" class="validation-detail">—</span>
         </div>
 
-        <div class="validation-box">
-          <div class="validation-header">
-            <span>✓ Deterministic Validator: PASSED</span>
-          </div>
-          <div style="color: var(--text-secondary);" id="validation-stats">
-            All 9 numerical thresholds, timestamps, and road names exist in ground-truth computed decision JSON. 0 hallucinations detected.
-          </div>
-        </div>
-
-        <button id="approve-dispatch-btn" class="approve-btn" onclick="handleApproveAdvisory()">
-          <span>✓ Authorize & Dispatch (Human Approval)</span>
+        <!-- Human-in-the-loop approval -->
+        <button id="approve-dispatch-btn" class="approve-btn" onclick="handleApproveAdvisory()"
+                aria-label="Authorize and dispatch advisory">
+          <span class="btn-icon">✓</span> Authorize &amp; Dispatch
         </button>
-        
-        <button class="time-btn" style="width: 100%; margin-top: 0.75rem; padding: 0.6rem;" onclick="viewCAPModal()">
-          Inspect Common Alerting Protocol (CAP 1.2 XML)
+
+        <!-- CAP export -->
+        <button class="secondary-btn" onclick="viewCAPModal()"
+                aria-label="View CAP 1.2 XML">
+          <span>&#x2197;</span> Inspect CAP 1.2 XML
         </button>
       </div>
 
-      <!-- Tab 4: Backtest & Evaluation -->
-      <div id="tab-backtest" class="tab-content">
-        <div class="section-title">72h Pre-Landfall Backtest (Amphan 2020)</div>
-        
-        <div class="control-card" style="margin-bottom: 1rem;">
-          <div style="font-weight: 700; margin-bottom: 0.5rem; font-size: 0.85rem;">Flood Extent vs Copernicus EMS Reference</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
-            <div>IoU (Jaccard): <strong style="color: #38bdf8;">0.693</strong></div>
-            <div>F1-Score: <strong style="color: #38bdf8;">0.816</strong></div>
-            <div>Precision: <strong style="color: #38bdf8;">0.842</strong></div>
-            <div>Recall: <strong style="color: #38bdf8;">0.791</strong></div>
-          </div>
+      <!-- Tab 4: Backtest Metrics -->
+      <div id="tab-backtest" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-backtest">
+        <div class="panel-header">
+          <h2 class="panel-title">72h Pre-Landfall Backtest</h2>
+          <span class="panel-sub">Amphan 2020 · Copernicus EMS Reference</span>
         </div>
 
-        <div class="section-title">Benchmark vs Naive Baselines</div>
-        <div id="baseline-comparison" style="font-size: 0.75rem;">
-          Loading baseline comparisons...
+        <div class="backtest-metrics-grid" id="backtest-metrics-grid">
+          <!-- Filled by Renderer.renderBacktest -->
+          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">IoU</div></div>
+          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">F1</div></div>
+          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">Precision</div></div>
+          <div class="metric-cell"><div class="metric-cell-val">—</div><div class="metric-cell-label">Recall</div></div>
+        </div>
+
+        <div class="section-label" style="margin-top:1.25rem">Benchmark vs Naive Baselines</div>
+        <div class="table-wrapper">
+          <table class="data-table" aria-label="Baseline comparison table">
+            <thead>
+              <tr>
+                <th>Model</th><th>Lead</th><th>FAR</th><th>Prec</th><th>F1</th>
+              </tr>
+            </thead>
+            <tbody id="baseline-table-body">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
+
     </aside>
-
   </div>
 
-  <!-- Modal for CAP 1.2 XML View -->
-  <div id="cap-modal" class="modal-overlay" onclick="closeCAPModal(event)">
+  <!-- ══════════════════════════════════════════════════════════════
+       CAP 1.2 XML MODAL
+  ══════════════════════════════════════════════════════════════ -->
+  <div id="cap-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="CAP 1.2 XML payload">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div style="font-weight: 700;">CAP 1.2 Standard Alert Payload</div>
-        <button class="close-btn" onclick="closeCAPModal()">&times;</button>
+        <div class="modal-title">
+          <span class="modal-icon">📡</span>
+          OASIS CAP 1.2 Alert Payload
+        </div>
+        <button class="close-btn" onclick="closeCAPModal()" aria-label="Close CAP modal">✕</button>
       </div>
-      <div id="cap-xml-content" class="modal-body">Loading CAP XML...</div>
+      <div class="modal-badge-row">
+        <span class="tag-golden">CAP 1.2 Compliant</span>
+        <span class="tag-info">Emergency Broadcast Standard</span>
+      </div>
+      <pre id="cap-xml-content" class="modal-code">Loading…</pre>
     </div>
   </div>
 
   <!-- MapLibre GL JS -->
   <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-  <!-- Main Application Script -->
+  <!-- Application Logic -->
   <script src="/static/app.js"></script>
 </body>
 </html>
