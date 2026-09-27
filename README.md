@@ -1,10 +1,27 @@
+---
+title: Aegis-APAC Cyclone Impact Platform
+emoji: 🌀
+colorFrom: red
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: true
+license: mit
+short_description: Anticipatory cyclone impact forecasting for coastal APAC communities
+tags:
+  - disaster-management
+  - climate
+  - fastapi
+  - cyclone
+  - anticipatory-action
+---
 # Aegis-APAC: Cyclone Impact & Critical Infrastructure Vulnerability Forecaster
 
 > **Anticipatory Action, Cascading Infrastructure Failure Prediction, and Parametric Liquidity for Asia-Pacific Coastal Communities.**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-green.svg)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/tests-50%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-67%20passed-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Digital Public Good](https://img.shields.io/badge/DPG-Standard%20Compliant-blueviolet.svg)](docs/digital_public_good.md)
 
@@ -75,7 +92,9 @@ cp .env.example .env
 uvicorn src.api.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 Open your browser to:
-- **Interactive Map Dashboard:** [http://localhost:8080/](http://localhost:8080/)
+- **Citizen Safety Home (Simple Mode UI):** [http://localhost:8080/](http://localhost:8080/)
+- **Control Room Ops Console (Officials & Judges):** [http://localhost:8080/console](http://localhost:8080/console)
+- **Single-Glance Citizen Status Endpoint:** [http://localhost:8080/status](http://localhost:8080/status)
 - **Interactive OpenAPI Documentation:** [http://localhost:8080/docs](http://localhost:8080/docs)
 - **Health Check:** [http://localhost:8080/health](http://localhost:8080/health)
 - **Observability Metrics:** [http://localhost:8080/metrics](http://localhost:8080/metrics)
@@ -108,29 +127,29 @@ python -m pytest
 
 ```
 aegis-apac/
-├── AGENTS.md                  # Strict hard agent rules
-├── DECISIONS.md               # Architectural decisions & assumptions log
-├── Dockerfile                 # Production Cloud Run container definition
-├── pyproject.toml             # Python build configuration and dependencies
-├── contracts/                 # Frozen JSON Schemas (Facility, Risk, Action, Advisory)
-├── regions/
-│   └── bengal_delta/          # Pilot region config (AOI, thresholds, languages)
-├── data/
-│   ├── raw/                   # Raw ingested datasets
-│   ├── processed/             # Cleaned GeoTIFFs, DEM grids, OSM layers
-│   └── golden/                # Frozen precomputed scenario bundle (DEMO_MODE)
-├── src/
-│   ├── api/                   # FastAPI backend, middleware, and routing
-│   ├── backtest/              # Evaluation metrics, baselines (B1, B2), SVG charts
-│   ├── decision/              # Evacuation allocator, road closures, de-energization
-│   ├── graph/                 # NetworkX directed graph & cascade failure engine
-│   ├── hazard/                # Holland profile, surge setup, BFS connectivity, ensemble
-│   ├── ingest/                # IBTrACS, Copernicus DEM, GPM rainfall, OSM pipeline
-│   ├── llm/                   # Gemini 3.7 Flash, strict validator, templates, CAP export
-│   └── parametric/            # Parametric insurance triggers & basis risk report
-├── web/                       # MapLibre GL JS frontend (HTML/CSS/JS)
-├── tests/                     # 50 unit, integration, property, and adversarial tests
-└── docs/                      # PRD, build plan, backtest report, demo script, slides, DPG
+â”œâ”€â”€ AGENTS.md                  # Strict hard agent rules
+â”œâ”€â”€ DECISIONS.md               # Architectural decisions & assumptions log
+â”œâ”€â”€ Dockerfile                 # Production Cloud Run container definition
+â”œâ”€â”€ pyproject.toml             # Python build configuration and dependencies
+â”œâ”€â”€ contracts/                 # Frozen JSON Schemas (Facility, Risk, Action, Advisory)
+â”œâ”€â”€ regions/
+â”‚   â””â”€â”€ bengal_delta/          # Pilot region config (AOI, thresholds, languages)
+â”œâ”€â”€ data/
+â”‚   â”œâ”€â”€ raw/                   # Raw ingested datasets
+â”‚   â”œâ”€â”€ processed/             # Cleaned GeoTIFFs, DEM grids, OSM layers
+â”‚   â””â”€â”€ golden/                # Frozen precomputed scenario bundle (DEMO_MODE)
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ api/                   # FastAPI backend, middleware, and routing
+â”‚   â”œâ”€â”€ backtest/              # Evaluation metrics, baselines (B1, B2), SVG charts
+â”‚   â”œâ”€â”€ decision/              # Evacuation allocator, road closures, de-energization
+â”‚   â”œâ”€â”€ graph/                 # NetworkX directed graph & cascade failure engine
+â”‚   â”œâ”€â”€ hazard/                # Holland profile, surge setup, BFS connectivity, ensemble
+â”‚   â”œâ”€â”€ ingest/                # IBTrACS, Copernicus DEM, GPM rainfall, OSM pipeline
+â”‚   â”œâ”€â”€ llm/                   # Gemini 3.7 Flash, strict validator, templates, CAP export
+â”‚   â””â”€â”€ parametric/            # Parametric insurance triggers & basis risk report
+â”œâ”€â”€ web/                       # MapLibre GL JS frontend (HTML/CSS/JS)
+â”œâ”€â”€ tests/                     # 50 unit, integration, property, and adversarial tests
+â””â”€â”€ docs/                      # PRD, build plan, backtest report, demo script, slides, DPG
 ```
 
 ---
@@ -145,7 +164,7 @@ Evaluated against Copernicus EMS satellite flood delineations and naive baseline
 | **Precision** | 0.410 | 0.680 | **0.842** | **+23.8% precision** |
 | **Facility Warning Lead Time** | 0.0 h | 6.0 h | **18.5 h** | **+208% lead time** |
 | **False Alarm Rate** | 62.0% | 38.0% | **12.0%** | **-68.4% reduction** |
-| **Ensemble Brier Score** | — | — | **0.084** | **Calibrated uncertainty** |
+| **Ensemble Brier Score** | â€” | â€” | **0.084** | **Calibrated uncertainty** |
 
 Detailed report and figures available in [docs/backtest_report.md](docs/backtest_report.md) and [docs/figures/](docs/figures/).
 
@@ -155,3 +174,4 @@ Detailed report and figures available in [docs/backtest_report.md](docs/backtest
 
 - **Code:** [MIT License](LICENSE)
 - **Data Attributions:** Copernicus DEM (ESA), IBTrACS (NOAA), GPM IMERG (NASA), OpenStreetMap contributors (ODbL), WorldPop (CC BY 4.0), CartoDB Positron (Free / Open).
+
