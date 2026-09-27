@@ -133,3 +133,53 @@ class DeterministicTemplateEngine:
                     f"Stay off inundated roads and evacuate to your designated cyclone shelter immediately. "
                     f"For emergency rescue and medical assistance, call District Helpline 1077 or 112."
                 )
+
+    @staticmethod
+    def render_plain_instruction(role: AdvisoryRole, language: str, payload: Dict[str, Any]) -> str:
+        """Render a single, plain-language instruction sentence for citizens / operators."""
+        actions = payload.get("actions", [])
+        facilities = {f.get("id"): f for f in payload.get("facilities", [])}
+        risks = payload.get("risks", [])
+        top_risk = risks[0] if risks else {}
+        top_risk_fac = facilities.get(top_risk.get("facility_id", ""), {})
+        top_fac_name = top_risk_fac.get("name", "Sagar Island Substation")
+
+        # Find target shelter from evacuation action if present
+        shelter_name = "Sagar Central Shelter"
+        for a in actions:
+            desc = a.get("description", "")
+            if "Sagar Central Shelter" in desc:
+                shelter_name = "Sagar Central Shelter"
+                break
+
+        lang = language.lower()
+
+        if role == AdvisoryRole.POWER_OPERATOR:
+            if lang == "bn":
+                return f"নিরাপত্তার স্বার্থে {top_fac_name} বিদ্যুৎ সংযোগ বিচ্ছিন্ন করা হবে।"
+            elif lang == "hi":
+                return f"सुरक्षा हेतु {top_fac_name} विद्युत आपूर्ति बंद की जाएगी।"
+            elif lang == "or":
+                return f"ନିରାପତ୍ତା ପାଇଁ {top_fac_name} ବିଦ୍ୟୁତ ସରବରାହ ବନ୍ଦ ରହିବ।"
+            else:
+                return f"Proactively de-energise {top_fac_name} before water reaches 0.4m."
+
+        elif role == AdvisoryRole.CITIZENS:
+            if lang == "bn":
+                return f"প্লাবিত রাস্তা এড়িয়ে ভোর ০৪:০০ টার মধ্যে {shelter_name}-এ চলে যান।"
+            elif lang == "hi":
+                return f"जलमग्न सड़कों से बचें और सुबह 04:00 बजे से पहले {shelter_name} में जाएं।"
+            elif lang == "or":
+                return f"ବନ୍ୟା ପ୍ରଭାବିତ ରାସ୍ତା ଛାଡ଼ି ସକାଳ ୦୪:୦୦ ପୂର୍ବରୁ {shelter_name}କୁ ଯାଆନ୍ତୁ।"
+            else:
+                return f"Move immediately to {shelter_name} before 04:00. Avoid flooded roads."
+
+        else:  # Collector / default
+            if lang == "bn":
+                return f"ভোর ০৪:০০ টার মধ্যে {shelter_name}-এ নিরাপদ আশ্রয়ে পৌঁছান।"
+            elif lang == "hi":
+                return f"सुबह 04:00 बजे से पहले {shelter_name} में सुरक्षित पहुंचें।"
+            elif lang == "or":
+                return f"ସକାଳ ୦୪:୦୦ ପୂର୍ବରୁ {shelter_name}ରେ ସୁରକ୍ଷିତ ପହଞ୍ଚନ୍ତୁ।"
+            else:
+                return f"Move to {shelter_name} before 04:00."

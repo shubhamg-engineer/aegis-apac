@@ -1,0 +1,733 @@
+/* ==========================================================================
+   Aegis-APAC Citizen Home (Simple Mode UI) — Design System & Styles
+   Designed for radical simplicity, high contrast, mobile-first performance,
+   and instant 2-second situational comprehension.
+   ========================================================================== */
+
+:root {
+  /* Base Dark Palette */
+  --bg-dark: #070c14;
+  --bg-card: rgba(15, 23, 42, 0.75);
+  --bg-card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+  --text-sub: #cbd5e1;
+
+  /* State: Safe (Green) */
+  --safe-bg: #064e3b;
+  --safe-accent: #10b981;
+  --safe-glow: rgba(16, 185, 129, 0.35);
+  --safe-surface: rgba(6, 78, 59, 0.4);
+  --safe-border: rgba(16, 185, 129, 0.4);
+
+  /* State: Watch (Yellow) */
+  --watch-bg: #713f12;
+  --watch-accent: #f59e0b;
+  --watch-glow: rgba(245, 158, 11, 0.35);
+  --watch-surface: rgba(113, 63, 18, 0.4);
+  --watch-border: rgba(245, 158, 11, 0.4);
+
+  /* State: Warning (Orange) */
+  --warning-bg: #7c2d12;
+  --warning-accent: #f97316;
+  --warning-glow: rgba(249, 115, 22, 0.4);
+  --warning-surface: rgba(124, 45, 18, 0.45);
+  --warning-border: rgba(249, 115, 22, 0.5);
+
+  /* State: Danger (Crimson Red) */
+  --danger-bg: #450a0a;
+  --danger-accent: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.5);
+  --danger-surface: rgba(69, 10, 10, 0.6);
+  --danger-border: rgba(239, 68, 68, 0.6);
+
+  /* Active State Tokens (Dynamically overridden by JS) */
+  --state-accent: var(--danger-accent);
+  --state-glow: var(--danger-glow);
+  --state-surface: var(--danger-surface);
+  --state-border: var(--danger-border);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 8px;
+  --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+  transition: background-color 0.4s ease;
+}
+
+/* Ambient dynamic background lighting */
+.ambient-glow {
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  max-width: 140vw;
+  height: 500px;
+  background: radial-gradient(circle, var(--state-glow) 0%, transparent 70%);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+  transition: background 0.5s ease;
+}
+
+/* Offline Banner */
+.offline-banner {
+  width: 100%;
+  background: #b45309;
+  color: #fff;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Main App Container */
+.citizen-app {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px 24px 20px;
+  z-index: 1;
+  position: relative;
+}
+
+/* ── Top Bar (Language + Location) ── */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.chip-btn:hover, .chip-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.chip-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.location-chip {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-chip .loc-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Main Hero Status Card ── */
+.status-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px 16px 36px 16px;
+}
+
+/* Huge Centered Status Icon */
+.status-icon-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--state-surface);
+  border: 2px solid var(--state-border);
+  box-shadow: 0 0 45px var(--state-glow);
+  transition: all 0.4s ease;
+}
+
+/* Pulse animation for Danger & Warning */
+.state-danger .status-icon-bg {
+  animation: dangerPulse 1.8s infinite;
+}
+
+.state-warning .status-icon-bg {
+  animation: warningPulse 2.4s infinite;
+}
+
+@keyframes dangerPulse {
+  0% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    transform: scale(0.97);
+  }
+  50% {
+    box-shadow: 0 0 55px rgba(239, 68, 68, 0.85);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    transform: scale(0.97);
+  }
+}
+
+@keyframes warningPulse {
+  0% {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+    transform: scale(0.98);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(249, 115, 22, 0.7);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+    transform: scale(0.98);
+  }
+}
+
+.status-icon-svg {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  z-index: 2;
+  color: var(--state-accent);
+  transition: color 0.3s ease;
+}
+
+/* One Word Headline */
+.status-headline {
+  font-size: clamp(34px, 9vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--state-accent);
+  line-height: 1.1;
+  margin-bottom: 14px;
+  text-shadow: 0 2px 14px var(--state-glow);
+  transition: color 0.3s ease;
+}
+
+/* One Plain Sentence Body */
+.status-message {
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--text-main);
+  max-width: 380px;
+  margin-bottom: 18px;
+}
+
+/* Last Checked Chip */
+.last-checked {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.last-checked .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--state-accent);
+}
+
+/* ── Progressive Disclosure CTA Buttons ── */
+.cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* Primary Action Button ("What should I do?") */
+.btn-primary-action {
+  width: 100%;
+  background: var(--state-accent);
+  color: #fff;
+  border: none;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px var(--state-glow);
+  transition: var(--transition);
+}
+
+.state-safe .btn-primary-action {
+  display: none; /* Only appears if not safe per spec */
+}
+
+.btn-primary-action:hover, .btn-primary-action:focus-visible {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px var(--state-glow);
+}
+
+/* Secondary Button ("See map & details ›") */
+.btn-secondary-action {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 15px 20px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: var(--transition);
+}
+
+.btn-secondary-action:hover, .btn-secondary-action:focus-visible {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* ── Expandable Action Drawer ("What should I do?") ── */
+.action-drawer {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--state-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: slideDown 0.3s ease forwards;
+}
+
+.action-drawer.open {
+  display: block;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.drawer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--state-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Action Checklist */
+.action-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-sub);
+}
+
+.action-item-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--state-accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Shelter Card */
+.shelter-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.shelter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+
+.shelter-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.shelter-distance {
+  background: var(--state-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.shelter-address {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.shelter-capacity {
+  font-size: 12px;
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Helpline Buttons Row */
+.emergency-call-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.call-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.call-btn:hover {
+  background: #334155;
+  transform: translateY(-1px);
+}
+
+.call-btn-danger {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.call-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.35);
+}
+
+/* ── Modal Overlays (Location, Simplified Map) ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 520px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px 20px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.close-modal-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--text-dim);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: var(--transition);
+}
+
+.close-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Location Selector List */
+.loc-option-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.loc-option-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.loc-option-btn.selected {
+  border-color: var(--state-accent);
+  background: var(--state-surface);
+}
+
+.loc-option-state-pill {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+/* Simplified Map in Modal */
+#simple-map-container {
+  width: 100%;
+  height: 280px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  background: #080d14;
+}
+
+.simple-map-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.legend-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch-flood {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(239, 68, 68, 0.65);
+  border: 1px solid #ef4444;
+}
+
+.legend-swatch-pin {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #38bdf8;
+  border: 2px solid #fff;
+}
+
+/* Official Advisory Box inside Map Sheet */
+.advisory-disclosure {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.advisory-disclosure summary {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+
+.advisory-full-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-sub);
+  margin-top: 10px;
+  font-family: inherit;
+  white-space: pre-wrap;
+}
+
+.ops-console-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #38bdf8;
+  text-decoration: none;
+  margin-top: 4px;
+}
+
+.ops-console-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Footer ("For officials" + attribution) ── */
+.citizen-footer {
+  margin-top: auto;
+  text-align: center;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.officials-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.officials-link:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dpg-tag {
+  font-size: 11px;
+  color: rgba(148, 163, 184, 0.5);
+  letter-spacing: 0.02em;
+}
+
+/* Responsive adjustments */
+@media (min-width: 600px) {
+  .citizen-app {
+    padding: 32px 24px;
+  }
+  .modal-overlay {
+    align-items: center;
+    padding: 20px;
+  }
+  .modal-sheet {
+    border-radius: 20px;
+  }
+}

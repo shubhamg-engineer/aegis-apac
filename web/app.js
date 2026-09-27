@@ -26,11 +26,16 @@ const ROLE_LABELS = {
 };
 
 const TYPE_COLORS = {
-  hospital:   "#10b981",
-  substation: "#ef4444",
-  shelter:    "#3b82f6",
-  bridge:     "#f59e0b",
-  road:       "#8b5cf6",
+  hospital:      "#10b981",
+  substation:    "#ef4444",
+  shelter:       "#3b82f6",
+  bridge:        "#f59e0b",
+  road:          "#8b5cf6",
+  road_segment:  "#8b5cf6",
+  telecom_tower: "#a78bfa",
+  school:        "#fb923c",
+  police:        "#facc15",
+  fire_station:  "#f43f5e",
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -240,7 +245,7 @@ const MapEngine = (() => {
       data: { type: "FeatureCollection", features: [] },
     });
 
-    // P(depth > 0.3m) — amber
+    // P(depth > 0.3m) — amber  [API uses 'prob' not 'probability']
     _map.addLayer({
       id: "hazard-flood-03",
       type: "fill",
@@ -248,12 +253,13 @@ const MapEngine = (() => {
       filter: ["==", ["get", "threshold_m"], 0.3],
       paint: {
         "fill-color": [
-          "interpolate", ["linear"], ["get", "probability"],
-          0.2, "rgba(249,115,22,0.15)",
-          0.6, "rgba(249,115,22,0.45)",
-          1.0, "rgba(249,115,22,0.70)",
+          "interpolate", ["linear"], ["get", "prob"],
+          0.0, "rgba(249,115,22,0.0)",
+          0.3, "rgba(249,115,22,0.20)",
+          0.6, "rgba(249,115,22,0.50)",
+          1.0, "rgba(249,115,22,0.72)",
         ],
-        "fill-outline-color": "rgba(234,88,12,0.5)",
+        "fill-outline-color": "rgba(234,88,12,0.4)",
       },
     });
 
@@ -265,12 +271,13 @@ const MapEngine = (() => {
       filter: ["==", ["get", "threshold_m"], 1.0],
       paint: {
         "fill-color": [
-          "interpolate", ["linear"], ["get", "probability"],
-          0.2, "rgba(239,68,68,0.25)",
-          0.6, "rgba(239,68,68,0.55)",
-          1.0, "rgba(239,68,68,0.80)",
+          "interpolate", ["linear"], ["get", "prob"],
+          0.0, "rgba(239,68,68,0.0)",
+          0.3, "rgba(239,68,68,0.28)",
+          0.6, "rgba(239,68,68,0.58)",
+          1.0, "rgba(239,68,68,0.82)",
         ],
-        "fill-outline-color": "rgba(220,38,38,0.6)",
+        "fill-outline-color": "rgba(220,38,38,0.5)",
       },
     });
   }
@@ -355,12 +362,26 @@ const MapEngine = (() => {
       el.addEventListener("mouseenter", () => { el.style.transform = "scale(1.4)"; });
       el.addEventListener("mouseleave", () => { el.style.transform = "scale(1)"; });
 
-      const popup = new maplibregl.Popup({ offset: 16, closeButton: false })
+      const riskPct = facility.failure_probability != null
+        ? Math.round(facility.failure_probability * 100) + "%"
+        : "—";
+      const riskColor = (facility.failure_probability || 0) > 0.6 ? "#ef4444"
+                      : (facility.failure_probability || 0) > 0.3 ? "#f97316" : "#22c55e";
+
+      const popup = new maplibregl.Popup({ offset: 20, closeButton: false, maxWidth: "220px" })
         .setHTML(`
-          <div style="font:600 0.8rem/1.4 Inter,sans-serif;color:#1e293b;">
-            <div>${facility.name}</div>
-            <div style="color:#64748b;font-size:0.7rem;text-transform:uppercase;">${facility.type}</div>
-            <div style="margin-top:0.25rem;font-size:0.7rem;">Elev: ${facility.elevation_m} m asl</div>
+          <div style="font-family:Inter,sans-serif;">
+            <div style="font-weight:700;font-size:12px;color:#e2e8f0;margin-bottom:4px">${facility.name}</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px">${facility.type.replace(/_/g,' ')}</div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+              <span style="font-size:11px;color:#94a3b8">Failure risk</span>
+              <span style="font-size:11px;font-weight:700;color:${riskColor}">${riskPct}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:11px;color:#94a3b8">Elevation</span>
+              <span style="font-size:11px;color:#e2e8f0">${facility.elevation_m} m asl</span>
+            </div>
+            <div style="margin-top:8px;font-size:10.5px;color:#38bdf8;cursor:pointer;text-align:center" onclick="AppState.set('selectedFacilityId','${facility.id}');AppState.set('activeTab','cascade');Renderer.renderTabs();DataLoader.loadCascade('${facility.id}')">Inspect cascade →</div>
           </div>
         `);
 
@@ -373,7 +394,9 @@ const MapEngine = (() => {
     });
   }
 
-  return { init, updateHazardData, updatePathwayData, setLayerVisibility, setMarkersVisibility, placeMarkers };
+  function getMap() { return _map; }
+
+  return { init, getMap, updateHazardData, updatePathwayData, setLayerVisibility, setMarkersVisibility, placeMarkers };
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1004,6 +1027,85 @@ function _startMetricsPoll() {
   DataLoader.loadMetrics();
   setInterval(DataLoader.loadMetrics, 30_000);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 9. REGION SEARCH  — Nominatim geocoder, flies map to result
+// ═══════════════════════════════════════════════════════════════════════════
+
+let _searchDebounce = null;
+
+async function onSearchInput(val) {
+  const clearBtn = document.getElementById("search-clear-btn");
+  const resultsEl = document.getElementById("search-results");
+
+  if (clearBtn) clearBtn.style.display = val.length > 0 ? "block" : "none";
+
+  clearTimeout(_searchDebounce);
+  if (val.trim().length < 2) {
+    resultsEl.style.display = "none";
+    return;
+  }
+
+  _searchDebounce = setTimeout(async () => {
+    try {
+      // Bias search toward Bengal Delta region (viewbox: W,S,E,N)
+      const url = `https://nominatim.openstreetmap.org/search?` +
+        `q=${encodeURIComponent(val)}&format=json&limit=6&addressdetails=1` +
+        `&viewbox=86.5,19.5,90.5,24.5&bounded=0`;
+      const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+      const data = await res.json();
+      _renderSearchResults(data, resultsEl);
+    } catch (e) {
+      resultsEl.innerHTML = `<div class="search-no-results">Search unavailable</div>`;
+      resultsEl.style.display = "block";
+    }
+  }, 350);
+}
+
+function _renderSearchResults(data, el) {
+  if (!data.length) {
+    el.innerHTML = `<div class="search-no-results">No results found</div>`;
+    el.style.display = "block";
+    return;
+  }
+  el.innerHTML = data.map((r, i) => {
+    const name = r.display_name.split(",").slice(0, 3).join(", ");
+    const type = (r.type || r.class || "").replace(/_/g, " ");
+    return `<div class="search-result-item" onclick="selectSearchResult(${r.lat},${r.lon},'${name.replace(/'/g,"\\'")}')">
+      <span class="search-result-name">${name}</span>
+      <span class="search-result-type">${type} · ${r.lat.substring ? parseFloat(r.lat).toFixed(3) : r.lat}°N, ${parseFloat(r.lon).toFixed(3)}°E</span>
+    </div>`;
+  }).join("");
+  el.style.display = "block";
+}
+
+function selectSearchResult(lat, lon, name) {
+  const map = MapEngine.getMap();
+  if (map) {
+    map.flyTo({ center: [parseFloat(lon), parseFloat(lat)], zoom: 12, speed: 1.4 });
+  }
+  document.getElementById("region-search").value = name;
+  document.getElementById("search-results").style.display = "none";
+  showToast(`📍 ${name}`, "success");
+}
+
+function clearSearch() {
+  document.getElementById("region-search").value = "";
+  document.getElementById("search-results").style.display = "none";
+  document.getElementById("search-clear-btn").style.display = "none";
+}
+
+function onSearchKey(e) {
+  if (e.key === "Escape") clearSearch();
+}
+
+// Close search dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-wrap")) {
+    const el = document.getElementById("search-results");
+    if (el) el.style.display = "none";
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 9. BOOTSTRAP

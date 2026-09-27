@@ -38,3 +38,9 @@ yarn-error.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Large binaries & generated data
+*.npz
+data/processed/
+graphify-out/
+*.log

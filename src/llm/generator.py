@@ -73,6 +73,8 @@ class AdvisoryGenerator:
             final_text = DeterministicTemplateEngine.render(role, language, decision_payload)
             validation = self.validator.validate(final_text, decision_payload)
 
+        plain_instruction = DeterministicTemplateEngine.render_plain_instruction(role, language, decision_payload)
+
         advisory = Advisory(
             id=advisory_id,
             scenario_id=scenario_id,
@@ -80,6 +82,7 @@ class AdvisoryGenerator:
             language=language,
             status=AdvisoryStatus.DRAFT,
             text=final_text,
+            plain_instruction=plain_instruction,
             validation=validation,
             history=[
                 StatusHistory(

@@ -107,6 +107,7 @@ class Advisory(BaseModel):
     language: str = Field(..., description="Language code: en, bn, hi, or")
     status: AdvisoryStatus = Field(default=AdvisoryStatus.DRAFT)
     text: str = Field(..., description="Validated advisory text content")
+    plain_instruction: Optional[str] = Field(default=None, description="One-sentence plain-language citizen instruction")
     validation: AdvisoryValidation = Field(...)
     history: List[StatusHistory] = Field(default_factory=list)
 
@@ -133,3 +134,24 @@ class ParametricResult(BaseModel):
     payout_triggered: bool = Field(..., description="True if trigger probability >= policy threshold")
     payout_amount_usd: float = Field(default=0.0)
     basis_risk: str = Field(..., description="Assessment of false positive / false negative risk")
+
+
+class CitizenStatusResponse(BaseModel):
+    state: str = Field(..., description="Danger state: Safe, Watch, Warning, Danger")
+    color: str = Field(..., description="Badge/theme color: green, yellow, orange, red")
+    icon: str = Field(..., description="Icon identifier: check, eye, triangle, siren")
+    headline: str = Field(..., description="Short single-glance headline")
+    plain_message: str = Field(..., description="Plain-language status message")
+    plain_instruction: str = Field(..., description="Plain-language citizen action instruction")
+    district: str = Field(..., description="Selected or detected district")
+    max_failure_probability: float = Field(..., description="Maximum facility failure probability in district")
+    parametric_trigger_probability: float = Field(..., description="Parametric insurance trigger probability")
+    has_evacuation_action: bool = Field(..., description="True if evacuation action is active for this district")
+    shelter_info: Dict[str, Any] = Field(..., description="Nearest shelter details")
+    emergency_contacts: List[Dict[str, str]] = Field(..., description="Key emergency phone numbers")
+    actions: List[str] = Field(..., description="List of immediate citizen actions")
+    advisory_id: Optional[str] = Field(default=None, description="Associated advisory ID if applicable")
+    advisory_text: Optional[str] = Field(default=None, description="Full verified advisory text")
+    last_updated: str = Field(..., description="ISO timestamp of last update")
+    language: str = Field(..., description="Language code")
+

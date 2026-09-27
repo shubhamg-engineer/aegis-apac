@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aegis-APAC — Cyclone Alert & Safety</title>
+  <meta name="description" content="Instant single-glance cyclone threat detection, shelter navigation, and life safety guidance for coastal Asia-Pacific communities.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- MapLibre GL CSS (deferred styling for simplified map) -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet">
+  
+  <!-- Citizen Stylesheet -->
+  <link rel="stylesheet" href="citizen.css">
+</head>
+<body>
+
+  <!-- Ambient lighting layer based on danger state -->
+  <div class="ambient-glow"></div>
+
+  <!-- Offline status indicator banner -->
+  <div id="offline-banner" class="offline-banner">
+    ⚡ Offline mode — Showing last confirmed status
+  </div>
+
+  <div id="citizen-app-root" class="citizen-app state-danger">
+
+    <!-- ── TOP BAR (Language + Location Chips) ── -->
+    <header class="top-nav">
+      <!-- Language Chip Button -->
+      <button id="btn-lang-selector" class="chip-btn" aria-label="Change Language">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="current-lang-label">EN</span>
+        <span style="font-size:10px;opacity:0.7">▾</span>
+      </button>
+
+      <!-- Location Chip Button -->
+      <button id="btn-loc-selector" class="chip-btn location-chip" aria-label="Select Location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span id="current-location-label" class="loc-label">South 24 Parganas</span>
+        <span style="font-size:10px;opacity:0.7">▾</span>
+      </button>
+    </header>
+
+    <!-- ── MAIN HERO STATUS CARD (One Glance, One Answer) ── -->
+    <main class="status-hero">
+      
+      <!-- Huge Centered Icon -->
+      <div class="status-icon-wrapper">
+        <div class="status-icon-bg"></div>
+        <div id="status-icon-svg-container">
+          <!-- Filled dynamically by citizen.js -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="status-icon-svg">
+            <path d="M12 2v3m-7.07 1.93l2.12 2.12m12.02-2.12l-2.12 2.12"/>
+            <path d="M6 14a6 6 0 0 1 12 0v5H6v-5z"/>
+            <path d="M4 19h16"/>
+            <path d="M9 14h6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- One Word Headline -->
+      <h1 id="status-headline" class="status-headline">TAKE ACTION NOW</h1>
+
+      <!-- One Plain Sentence Body -->
+      <p id="status-message" class="status-message">
+        Evacuate to Sagar Central Shelter before 4:00 AM.
+      </p>
+
+      <!-- Last Checked Badge -->
+      <div class="last-checked">
+        <span class="dot"></span>
+        <span id="last-checked-label">Last checked: Just now</span>
+      </div>
+
+    </main>
+
+    <!-- ── PROGRESSIVE DISCLOSURE ACTION DRAWER ── -->
+    <section id="action-drawer" class="action-drawer" aria-label="Action steps and shelter details">
+      <div class="drawer-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>Immediate Instructions</span>
+      </div>
+
+      <!-- Action checklist items -->
+      <ul id="action-checklist" class="action-list">
+        <!-- Injected via JavaScript -->
+      </ul>
+
+      <!-- Nearest Cyclone Shelter Card -->
+      <div class="shelter-card">
+        <div class="shelter-header">
+          <div id="shelter-name" class="shelter-name">Sagar Central Multi-purpose Shelter</div>
+          <span id="shelter-distance" class="shelter-distance">1.4 km</span>
+        </div>
+        <div id="shelter-address" class="shelter-address">Sagar Island Block, South 24 Parganas</div>
+        <div id="shelter-capacity" class="shelter-capacity">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Capacity: ~1,500 evacuees
+        </div>
+      </div>
+
+      <!-- One-Tap Emergency Helplines -->
+      <div class="emergency-call-grid">
+        <a href="tel:1077" class="call-btn call-btn-danger">
+          <span id="call-1077-label">📞 Helpline 1077</span>
+        </a>
+        <a href="tel:112" class="call-btn">
+          <span id="call-112-label">🚨 Emergency 112</span>
+        </a>
+        <a href="tel:108" class="call-btn" style="grid-column: span 2;">
+          <span id="call-108-label">🚑 Ambulance 108</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ── CALL TO ACTION BUTTONS ── -->
+    <div class="cta-group">
+      <!-- "What should I do?" (Only shown when not safe) -->
+      <button id="btn-action-drawer" class="btn-primary-action">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+        <span id="btn-action-drawer-text">What should I do?</span>
+      </button>
+
+      <!-- "See map & details ›" -->
+      <button id="btn-map-details" class="btn-secondary-action">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+        <span id="btn-map-details-text">See map & details ›</span>
+      </button>
+    </div>
+
+    <!-- ── FOOTER ("For officials" link, low-emphasis) ── -->
+    <footer class="citizen-footer">
+      <a href="/console" id="officials-link" class="officials-link">
+        For officials & control room ›
+      </a>
+      <div class="dpg-tag">
+        Aegis-APAC • Digital Public Good • Open Standards
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ═══ MODAL: LOCATION SELECTOR ═══════════════════════════════════════ -->
+  <div id="modal-loc" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="loc-modal-title">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div id="loc-modal-title" class="modal-title">Select Location</div>
+        <button class="close-modal-btn" aria-label="Close modal">✕</button>
+      </div>
+
+      <!-- GPS Option -->
+      <button id="btn-use-gps" class="loc-option-btn" style="border-color:rgba(56, 189, 248, 0.4);background:rgba(56, 189, 248, 0.08);">
+        <span>📍 Use My Current GPS Location</span>
+        <span style="font-size:12px;color:#38bdf8">Detect ›</span>
+      </button>
+
+      <div style="font-size:12px;color:var(--text-dim);margin:14px 0 8px 4px;font-weight:600;text-transform:uppercase;">
+        Available Coastal Districts (Demo & Verification)
+      </div>
+
+      <!-- District List (Lets user & judges test all 4 states!) -->
+      <button class="loc-option-btn loc-district-btn selected" data-district="South 24 Parganas">
+        <div>
+          <div>South 24 Parganas (Sagar Island)</div>
+          <div style="font-size:12px;color:var(--text-dim)">Landfall Path • Active Cyclone Zone</div>
+        </div>
+        <span class="loc-option-state-pill" style="background:rgba(239, 68, 68, 0.25);color:#fca5a5;">🚨 Danger</span>
+      </button>
+
+      <button class="loc-option-btn loc-district-btn" data-district="Purba Medinipur">
+        <div>
+          <div>Purba Medinipur (Digha Sector)</div>
+          <div style="font-size:12px;color:var(--text-dim)">Adjacent Coastal Area • Inundation Threat</div>
+        </div>
+        <span class="loc-option-state-pill" style="background:rgba(249, 115, 22, 0.25);color:#fdba74;">⚠️ Warning</span>
+      </button>
+
+      <button class="loc-option-btn loc-district-btn" data-district="North 24 Parganas">
+        <div>
+          <div>North 24 Parganas (Hingalganj)</div>
+          <div style="font-size:12px;color:var(--text-dim)">Inland Delta • Cyclone Monitoring</div>
+        </div>
+        <span class="loc-option-state-pill" style="background:rgba(245, 158, 11, 0.25);color:#fde68a;">👁️ Watch</span>
+      </button>
+
+      <button class="loc-option-btn loc-district-btn" data-district="Kolkata">
+        <div>
+          <div>Kolkata (Urban District)</div>
+          <div style="font-size:12px;color:var(--text-dim)">Inland Center • Outside Surge Envelope</div>
+        </div>
+        <span class="loc-option-state-pill" style="background:rgba(16, 185, 129, 0.25);color:#86efac;">✓ Safe</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: LANGUAGE SELECTOR ════════════════════════════════════════ -->
+  <div id="modal-lang" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="lang-modal-title">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div id="lang-modal-title" class="modal-title">Select Language</div>
+        <button class="close-modal-btn" aria-label="Close modal">✕</button>
+      </div>
+
+      <button class="loc-option-btn lang-opt-btn" data-lang="en">
+        <span>English</span>
+        <span style="font-size:12px;color:var(--text-dim)">English</span>
+      </button>
+
+      <button class="loc-option-btn lang-opt-btn" data-lang="bn">
+        <span>বাংলা</span>
+        <span style="font-size:12px;color:var(--text-dim)">Bengali</span>
+      </button>
+
+      <button class="loc-option-btn lang-opt-btn" data-lang="hi">
+        <span>हिन्दी</span>
+        <span style="font-size:12px;color:var(--text-dim)">Hindi</span>
+      </button>
+
+      <button class="loc-option-btn lang-opt-btn" data-lang="or">
+        <span>ଓଡ଼ିଆ</span>
+        <span style="font-size:12px;color:var(--text-dim)">Odia</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: SIMPLIFIED MAP & ADVISORY DETAILS ════════════════════════ -->
+  <div id="modal-map" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="map-modal-title">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div id="map-modal-title" class="modal-title">Flood Map & Advisory</div>
+        <button class="close-modal-btn" aria-label="Close modal">✕</button>
+      </div>
+
+      <!-- Simplified Map Container -->
+      <div id="simple-map-container"></div>
+
+      <!-- Simplified Legend -->
+      <div class="simple-map-legend">
+        <div class="legend-chip">
+          <div class="legend-swatch-flood"></div>
+          <span>Flooded Zone (&gt; 0.3m)</span>
+        </div>
+        <div class="legend-chip">
+          <div class="legend-swatch-pin"></div>
+          <span>Your Location</span>
+        </div>
+        <div class="legend-chip">
+          <span>🏛️ Shelter</span>
+        </div>
+      </div>
+
+      <!-- Collapsible Official Advisory Verbatim -->
+      <details class="advisory-disclosure">
+        <summary id="advisory-summary-label">Official Advisory Text (Control Room)</summary>
+        <div id="official-advisory-text" class="advisory-full-text">
+          Loading verified advisory…
+        </div>
+      </details>
+
+      <!-- Advanced Link to Ops Console -->
+      <div style="text-align:center;margin-top:14px;">
+        <a href="/console" class="ops-console-link">
+          Need advanced telemetry & infrastructure graph? Open Control Room Console ›
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MapLibre JS & Citizen App Logic -->
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js" defer></script>
+  <script src="citizen.js" defer></script>
+</body>
+</html>
