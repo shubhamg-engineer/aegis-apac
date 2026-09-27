@@ -7,7 +7,7 @@ sdk: docker
 app_port: 7860
 pinned: true
 license: mit
-short_description: Anticipatory cyclone impact forecasting for coastal APAC communities
+short_description: Cyclone impact & infrastructure forecaster for APAC
 tags:
   - disaster-management
   - climate
